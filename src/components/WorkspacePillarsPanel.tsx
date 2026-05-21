@@ -19,6 +19,14 @@ interface WorkspacePillarsPanelProps {
   countryData: CountryData;
   onEvidenceClick: (paragraphId: string) => void;
   activeParagraphId: string | null;
+  isScoringLoading?: boolean;
+}
+
+interface ScoringDetail {
+  scoringRule: string;
+  detectedCondition: string;
+  reasoning: string;
+  complianceImplication: string;
 }
 
 const subpillarLabels: Record<string, string> = {
@@ -34,11 +42,87 @@ const subpillarLabels: Record<string, string> = {
   "7.5": "Privacy enforcement mechanisms",
 };
 
-function ScoreBadge({ score }: { score: number }) {
+const scoringDetails: Record<string, ScoringDetail> = {
+  "6.1": {
+    scoringRule: "Score is high when regulation restricts cross-border transfer broadly or creates approval barriers across major data categories.",
+    detectedCondition: "Transfer is allowed only with coordination or supervisory authority involvement.",
+    reasoning: "The measure creates procedural friction for cross-border transfers, but does not operate as a complete transfer prohibition.",
+    complianceImplication: "Organizations may need transfer review workflows and documentation before sending data abroad.",
+  },
+  "6.2": {
+    scoringRule: "Score is moderate when local storage or accessibility obligations apply to a specific category of data without prohibiting transfer.",
+    detectedCondition: "Local accessibility requirement for a specific set of electronic system data.",
+    reasoning: "A copy of certain electronic system data must remain accessible in Indonesia, creating storage readiness duties without a full localization ban.",
+    complianceImplication: "Moderate compliance burden due to local accessibility and storage readiness requirements.",
+  },
+  "6.3": {
+    scoringRule: "Score is high when processing or infrastructure must be located domestically for covered operators or broad service categories.",
+    detectedCondition: "Domestic processing and local infrastructure requirements for electronic system operators.",
+    reasoning: "The evidence points to domestic data center, disaster recovery, and processing obligations that constrain operational architecture.",
+    complianceImplication: "High infrastructure burden for covered operators that need local facilities or domestic processing capacity.",
+  },
+  "6.4": {
+    scoringRule: "Score is high when cross-border transfer is permitted only under conditions such as adequacy, consent, approval, or binding safeguards.",
+    detectedCondition: "Conditional transfer regime based on adequacy, safeguards, consent, or coordination.",
+    reasoning: "Transfers remain possible, but only after meeting legal conditions that affect interoperability and data mobility.",
+    complianceImplication: "Organizations need transfer assessments, consent records, or safeguards before moving covered data.",
+  },
+  "6.5": {
+    scoringRule: "Score reflects whether other measures create additional restrictions or whether binding commitments preserve transfer openness.",
+    detectedCondition: "International commitment allows business-related data transfers with public policy exceptions.",
+    reasoning: "The commitment supports interoperability but still allows exceptions where justified by legitimate policy objectives.",
+    complianceImplication: "Lower restriction impact, though teams must monitor exceptions that could narrow transfer rights.",
+  },
+  "7.1": {
+    scoringRule: "Score is lower when a comprehensive data protection framework exists and applies horizontally across sectors.",
+    detectedCondition: "Horizontal personal data protection framework identified.",
+    reasoning: "A comprehensive law reduces the gap in privacy governance and establishes baseline rights and obligations.",
+    complianceImplication: "Organizations must align privacy practices with general data protection obligations.",
+  },
+  "7.2": {
+    scoringRule: "Score is moderate when cybersecurity or privacy-adjacent rights exist through non-dedicated or sectoral frameworks.",
+    detectedCondition: "Cybersecurity and public interest controls exist but are not a standalone comprehensive framework.",
+    reasoning: "The framework creates safeguards and government powers but may not cover all privacy rights uniformly.",
+    complianceImplication: "Moderate review burden to map obligations across overlapping legal instruments.",
+  },
+  "7.3": {
+    scoringRule: "Score increases when mandatory retention periods apply to personal or transaction data categories.",
+    detectedCondition: "Minimum retention period for selected electronic transaction data.",
+    reasoning: "Mandatory retention increases compliance burden and may affect data minimization and storage operations.",
+    complianceImplication: "Teams need retention schedules, storage controls, and deletion exceptions for covered data.",
+  },
+  "7.4": {
+    scoringRule: "Score increases when accountability duties such as DPO, DPIA, reporting, or documentation are required.",
+    detectedCondition: "DPO and DPIA obligations apply to controllers, processors, or high-risk processing.",
+    reasoning: "Accountability measures increase governance maturity but also create operational compliance requirements.",
+    complianceImplication: "Organizations may need responsible officers, risk assessments, and audit-ready documentation.",
+  },
+  "7.5": {
+    scoringRule: "Score is high when enforcement or access mechanisms allow broad government access or weak independent oversight.",
+    detectedCondition: "Government access and law enforcement cooperation duties are present.",
+    reasoning: "Broad access powers can affect privacy protection strength and increase disclosure obligations.",
+    complianceImplication: "Organizations need procedures for lawful access requests and oversight documentation.",
+  },
+};
+
+function ScoreBadge({ score, loading = false }: { score: number; loading?: boolean }) {
   const color = score >= 0.8 ? "bg-red-100 text-red-700 border-red-200"
-    : score >= 0.5 ? "bg-amber-100 text-amber-700 border-amber-200"
-    : score > 0 ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+    : score >= 0.5 ? "bg-primary-100 text-primary-700 border-primary-200"
+    : score > 0 ? "bg-primary-100 text-primary-700 border-primary-200"
     : "bg-emerald-100 text-emerald-700 border-emerald-200";
+
+  if (loading) {
+    return (
+      <span className="inline-flex h-6 w-10 items-center justify-center overflow-hidden rounded-md border border-surface-200 bg-surface-100">
+        <motion.span
+          initial={{ x: "-140%" }}
+          animate={{ x: "140%" }}
+          transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
+          className="h-full w-1/2 bg-primary-300/70 blur-[1px]"
+        />
+      </span>
+    );
+  }
 
   return <span className={`inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-bold font-mono ${color}`}>{score.toFixed(1)}</span>;
 }
@@ -68,7 +152,7 @@ function EvidenceItem({ evidence, isActive, onClick }: { evidence: LinkedEvidenc
   );
 }
 
-function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick }: { indicator: IndicatorScore; activeParagraphId: string | null; onEvidenceClick: (paragraphId: string) => void }) {
+function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick, isScoringLoading }: { indicator: IndicatorScore; activeParagraphId: string | null; onEvidenceClick: (paragraphId: string) => void; isScoringLoading: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const hasActiveEvidence = indicator.evidence.some((ev) => ev.paragraphId === activeParagraphId);
 
@@ -97,7 +181,7 @@ function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick }: { indi
             <span className="text-[10px] text-ink-500">{indicator.evidence.length} evidence</span>
           </div>
         </div>
-        <ScoreBadge score={indicator.score} />
+        <ScoreBadge score={indicator.score} loading={isScoringLoading} />
       </button>
 
       <AnimatePresence>
@@ -109,16 +193,22 @@ function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick }: { indi
                   <Info className="h-3 w-3 text-primary-600" />
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-600">Scoring Rule</p>
                 </div>
-                <p className="text-[11px] leading-relaxed text-ink-600">{indicator.scoringRule}</p>
+                <p className="text-[11px] leading-relaxed text-ink-600">{scoringDetails[indicator.id]?.scoringRule || indicator.scoringRule}</p>
               </div>
 
-              <div className="space-y-1">
-                {indicator.matchedCriteria.map((criteria) => (
-                  <div key={criteria} className="flex items-start gap-1.5">
-                    <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" />
-                    <span className="text-[11px] text-ink-700">{criteria}</span>
-                  </div>
-                ))}
+              <div className="grid gap-2">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">Detected Condition</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{scoringDetails[indicator.id]?.detectedCondition || indicator.matchedCriteria.join(", ")}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">Reasoning</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{scoringDetails[indicator.id]?.reasoning || indicator.scoringRule}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-500">Compliance Implication</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-ink-700">{scoringDetails[indicator.id]?.complianceImplication || "Review operational impact against RDTII criteria."}</p>
+                </div>
               </div>
 
               <div>
@@ -143,7 +233,7 @@ function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick }: { indi
   );
 }
 
-function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceClick }: { pillar: PillarData; defaultOpen: boolean; activeParagraphId: string | null; onEvidenceClick: (paragraphId: string) => void }) {
+function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceClick, isScoringLoading }: { pillar: PillarData; defaultOpen: boolean; activeParagraphId: string | null; onEvidenceClick: (paragraphId: string) => void; isScoringLoading: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -161,16 +251,27 @@ function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceCli
           </div>
           <p className="mt-0.5 text-[10px] text-ink-500">{pillar.indicators.length} subpillars · Click evidence to highlight clauses</p>
         </div>
-        <motion.span
-          key={pillar.weightedScore}
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className={`font-mono text-xl font-bold ${
-            pillar.weightedScore >= 0.7 ? "text-red-600" : pillar.weightedScore >= 0.4 ? "text-amber-600" : "text-emerald-600"
-          }`}
-        >
-          {pillar.weightedScore.toFixed(2)}
-        </motion.span>
+        {isScoringLoading ? (
+          <div className="h-7 w-14 overflow-hidden rounded-md bg-surface-100">
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: "100%" }}
+              transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
+              className="h-full w-1/2 bg-primary-300/70"
+            />
+          </div>
+        ) : (
+          <motion.span
+            key={pillar.weightedScore}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className={`font-mono text-xl font-bold ${
+              pillar.weightedScore >= 0.7 ? "text-red-600" : pillar.weightedScore >= 0.4 ? "text-primary-700" : "text-emerald-600"
+            }`}
+          >
+            {pillar.weightedScore.toFixed(2)}
+          </motion.span>
+        )}
       </button>
 
       <AnimatePresence initial={false}>
@@ -178,7 +279,7 @@ function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceCli
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
             <div className="space-y-2 border-t border-surface-200 p-3">
               {pillar.indicators.map((indicator) => (
-                <SubpillarItem key={indicator.id} indicator={indicator} activeParagraphId={activeParagraphId} onEvidenceClick={onEvidenceClick} />
+                <SubpillarItem key={indicator.id} indicator={indicator} activeParagraphId={activeParagraphId} onEvidenceClick={onEvidenceClick} isScoringLoading={isScoringLoading} />
               ))}
             </div>
           </motion.div>
@@ -188,7 +289,7 @@ function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceCli
   );
 }
 
-export function WorkspacePillarsPanel({ countryData, onEvidenceClick, activeParagraphId }: WorkspacePillarsPanelProps) {
+export function WorkspacePillarsPanel({ countryData, onEvidenceClick, activeParagraphId, isScoringLoading = false }: WorkspacePillarsPanelProps) {
   return (
     <div className="w-[480px] shrink-0 overflow-y-auto border-r border-surface-200 bg-surface-50 p-3">
       <div className="mb-3 rounded-xl border border-surface-200 bg-white px-4 py-3">
@@ -204,6 +305,7 @@ export function WorkspacePillarsPanel({ countryData, onEvidenceClick, activePara
             defaultOpen={pillar.number === 6}
             activeParagraphId={activeParagraphId}
             onEvidenceClick={onEvidenceClick}
+            isScoringLoading={isScoringLoading}
           />
         ))}
       </div>

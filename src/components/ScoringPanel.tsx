@@ -13,8 +13,8 @@ interface ScoringPanelProps {
 
 function ScoreBadge({ score }: { score: number }) {
   const color = score >= 0.8 ? "bg-red-100 text-red-700 border-red-200"
-    : score >= 0.5 ? "bg-amber-100 text-amber-700 border-amber-200"
-    : score > 0 ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+    : score >= 0.5 ? "bg-primary-100 text-primary-700 border-primary-200"
+    : score > 0 ? "bg-primary-100 text-primary-700 border-primary-200"
     : "bg-emerald-100 text-emerald-700 border-emerald-200";
   return <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-bold border ${color}`}>{score.toFixed(1)}</span>;
 }
@@ -107,12 +107,12 @@ export function ScoringPanel({ pillar, onEvidenceClick, activeParagraphId }: Sco
             <p className="text-[10px] text-ink-500 mt-0.5">{pillar.indicators.length} indicators · Click evidence to highlight</p>
           </div>
           <motion.p key={pillar.weightedScore} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className={`text-xl font-bold font-mono ${
-            pillar.weightedScore >= 0.7 ? "text-red-600" : pillar.weightedScore >= 0.4 ? "text-amber-600" : "text-emerald-600"
+            pillar.weightedScore >= 0.7 ? "text-red-600" : pillar.weightedScore >= 0.4 ? "text-primary-700" : "text-emerald-600"
           }`}>{pillar.weightedScore.toFixed(2)}</motion.p>
         </div>
         <div className="mt-2 h-1.5 bg-surface-200 rounded-full overflow-hidden">
           <motion.div initial={{ width: 0 }} animate={{ width: `${pillar.weightedScore * 100}%` }} transition={{ duration: 0.8, ease: "easeOut" }} className={`h-full rounded-full ${
-            pillar.weightedScore >= 0.7 ? "bg-gradient-to-r from-red-400 to-red-600" : pillar.weightedScore >= 0.4 ? "bg-gradient-to-r from-amber-400 to-amber-600" : "bg-gradient-to-r from-emerald-400 to-emerald-600"
+            pillar.weightedScore >= 0.7 ? "bg-gradient-to-r from-red-400 to-red-600" : pillar.weightedScore >= 0.4 ? "bg-primary-500" : "bg-gradient-to-r from-emerald-400 to-emerald-600"
           }`} />
         </div>
       </div>

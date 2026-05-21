@@ -11,50 +11,48 @@ interface AlertsPanelProps {
 
 function severityClass(severity: WorkspaceAlert["severity"]) {
   if (severity === "High") return "border-red-200 bg-red-50 text-red-700";
-  if (severity === "Medium") return "border-amber-200 bg-amber-50 text-amber-700";
+  if (severity === "Medium") return "border-primary-200 bg-primary-50 text-primary-700";
   return "border-blue-200 bg-blue-50 text-blue-700";
 }
 
 function AlertCard({ alert, index }: { alert: WorkspaceAlert; index: number }) {
+  const relatedLabel = alert.relatedSubpillar || alert.relatedPillar || "Workspace";
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="overflow-hidden rounded-xl border border-surface-200 bg-white shadow-sm"
+      className="rounded-xl border border-surface-200 bg-white px-4 py-3 shadow-sm"
     >
-      <div className="px-5 py-4">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-primary-600">
-            <AlertTriangle className="h-5 w-5" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="mb-2 flex flex-wrap items-center gap-2">
-              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${severityClass(alert.severity)}`}>
-                {alert.severity}
-              </span>
-              <span className="rounded-full bg-surface-100 px-2 py-0.5 text-[10px] font-medium text-ink-600">
-                {alert.type}
-              </span>
-              <span className="text-[10px] text-ink-400">{alert.timestamp}</span>
-            </div>
-            <p className="text-sm font-medium leading-relaxed text-ink-800">{alert.message}</p>
-            {(alert.relatedPillar || alert.relatedSubpillar) && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {alert.relatedPillar && (
-                  <span className="rounded-md bg-primary-50 px-2 py-1 text-[10px] font-semibold text-primary-700">
-                    {alert.relatedPillar}
-                  </span>
-                )}
-                {alert.relatedSubpillar && (
-                  <span className="rounded-md bg-surface-100 px-2 py-1 text-[10px] font-medium text-ink-600">
-                    {alert.relatedSubpillar}
-                  </span>
-                )}
-              </div>
-            )}
-          </div>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-primary-600" />
+          <h2 className="truncate text-sm font-semibold text-ink-900">{alert.title}</h2>
         </div>
+        <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${severityClass(alert.severity)}`}>
+          {alert.severity}
+        </span>
+      </div>
+
+      <div className="mt-1.5 flex flex-wrap items-center gap-2 pl-6 text-xs text-ink-500">
+        <span className="font-medium text-ink-600">{relatedLabel}</span>
+        <span className="text-ink-300">·</span>
+        <span>{alert.timestamp}</span>
+      </div>
+
+      <div className="mt-2 pl-6">
+        <p className="text-sm leading-relaxed text-ink-700">{alert.message}</p>
+        {alert.relatedPillar && alert.relatedSubpillar && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <span className="rounded-md bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-700">
+              {alert.relatedPillar}
+            </span>
+            <span className="rounded-md bg-surface-100 px-2 py-0.5 text-[10px] font-medium text-ink-600">
+              {alert.type}
+            </span>
+          </div>
+        )}
       </div>
     </motion.article>
   );

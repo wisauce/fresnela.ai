@@ -3,6 +3,7 @@
 export interface WorkspaceAlert {
   id: string;
   workspace: string;
+  title: string;
   type: "Missing Evidence" | "Low Confidence Mapping" | "Outdated Source";
   message: string;
   severity: "High" | "Medium" | "Low";
@@ -15,6 +16,7 @@ export const workspaceAlerts: WorkspaceAlert[] = [
   {
     id: "workspace-alert-id-1",
     workspace: "Indonesia",
+    title: "Missing Evidence in Local Storage Requirement",
     type: "Missing Evidence",
     message: "Pillar 6.2 has local storage requirements but no linked source paragraph.",
     severity: "High",
@@ -25,6 +27,7 @@ export const workspaceAlerts: WorkspaceAlert[] = [
   {
     id: "workspace-alert-id-2",
     workspace: "Indonesia",
+    title: "Low Confidence Data Retention Mapping",
     type: "Low Confidence Mapping",
     message: "Pillar 7.3 data retention classification requires analyst review.",
     severity: "Medium",
@@ -35,6 +38,7 @@ export const workspaceAlerts: WorkspaceAlert[] = [
   {
     id: "workspace-alert-sg-1",
     workspace: "Singapore",
+    title: "Outdated Cross-Border Transfer Source",
     type: "Outdated Source",
     message: "Source document has been updated and requires re-checking.",
     severity: "Medium",

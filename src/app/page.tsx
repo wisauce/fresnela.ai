@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, Play, CheckCircle2 } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { WorkspacePillarsPanel } from "@/components/WorkspacePillarsPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
@@ -23,11 +24,32 @@ export default function Home() {
   const [selectedWorkspace, setSelectedWorkspace] = useState("Indonesia");
   const [activeParagraphId, setActiveParagraphId] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isScoringRunning, setIsScoringRunning] = useState(false);
+  const [scoringMessage, setScoringMessage] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState("2026-01-10 14:30");
 
   const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
 
   const handleEvidenceClick = (paragraphId: string) => {
-    setActiveParagraphId(paragraphId);
+    setActiveParagraphId((current) => current === paragraphId ? null : paragraphId);
+  };
+
+  const formatTimestamp = (date: Date) => {
+    const pad = (value: number) => String(value).padStart(2, "0");
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  };
+
+  const handleRunScoring = () => {
+    setIsScoringRunning(true);
+    setScoringMessage("Analyzing mapped evidence against RDTII subpillar criteria...");
+
+    window.setTimeout(() => {
+      setLastUpdated(formatTimestamp(new Date()));
+      setIsScoringRunning(false);
+      setScoringMessage("Scoring updated");
+
+      window.setTimeout(() => setScoringMessage(null), 2200);
+    }, 1800);
   };
 
   const handleWorkspaceModeChange = (mode: "view" | "edit") => {
@@ -59,6 +81,7 @@ export default function Home() {
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={currentWorkspaceAlerts.length}
         onAlertsClick={() => setActiveView("alerts")}
+        isScoreLoading={isScoringRunning}
       />
 
       {/* Main Content */}
@@ -66,7 +89,7 @@ export default function Home() {
         <TopBar
           workspaceMode={workspaceMode}
           hasUnsavedChanges={hasUnsavedChanges}
-          lastUpdated="2026-01-10 14:30"
+          lastUpdated={lastUpdated}
           onWorkspaceModeChange={handleWorkspaceModeChange}
           onCancelChanges={handleCancelChanges}
           onSaveChanges={handleSaveChanges}
@@ -83,6 +106,26 @@ export default function Home() {
                 transition={{ duration: 0.2 }}
                 className="flex h-full flex-col"
               >
+                {workspaceMode === "view" && (
+                  <div className="flex items-center justify-between gap-4 border-b border-surface-200 bg-white px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-ink-900">RDTII Subpillar Scoring</p>
+                      <p className="mt-0.5 text-xs text-ink-500">
+                        {scoringMessage || "Evaluate mapped evidence against scope, restriction level, compliance burden, and interoperability impact."}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRunScoring}
+                      disabled={isScoringRunning}
+                      className="flex shrink-0 items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-ink-900 transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
+                    >
+                      {isScoringRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : scoringMessage === "Scoring updated" ? <CheckCircle2 className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                      {isScoringRunning ? "Running scoring..." : scoringMessage === "Scoring updated" ? "Scoring updated" : "Run Scoring"}
+                    </button>
+                  </div>
+                )}
+
                 <div className="flex-1 overflow-hidden">
                   {workspaceMode === "view" ? (
                     <div className="flex h-full">
@@ -91,6 +134,7 @@ export default function Home() {
                         countryData={indonesiaData}
                         onEvidenceClick={handleEvidenceClick}
                         activeParagraphId={activeParagraphId}
+                        isScoringLoading={isScoringRunning}
                       />
 
                       {/* Right: Consolidated Measure as reference */}

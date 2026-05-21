@@ -42,7 +42,7 @@ export default function VersionHistoryPage() {
           onSaveChanges={() => undefined}
         />
 
-        <main className="flex-1 overflow-hidden bg-surface-50">
+        <main className="relative z-0 flex-1 overflow-hidden bg-surface-50">
           <div className="flex h-full">
             <aside className="w-80 shrink-0 overflow-y-auto border-r border-surface-200 bg-white">
               <div className="sticky top-0 border-b border-surface-200 bg-white px-4 py-4">

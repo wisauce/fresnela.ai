@@ -1,17 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Epilogue:wght@100..900&display=swap');
 @import "tailwindcss";
 
 @theme {
   /* Amber/Gold Primary Palette */
   --color-primary-50: #fffbeb;
   --color-primary-100: #fef3c7;
-  --color-primary-200: #fde68a;
-  --color-primary-300: #fcd34d;
-  --color-primary-400: #fbbf24;
-  --color-primary-500: #f59e0b;
-  --color-primary-600: #d97706;
-  --color-primary-700: #b45309;
-  --color-primary-800: #92400e;
-  --color-primary-900: #78350f;
+  --color-primary-200: #ffc943;
+  --color-primary-300: #ffc943;
+  --color-primary-400: #ffc943;
+  --color-primary-500: #ffc943;
+  --color-primary-600: #ffc943;
+  --color-primary-700: #9a6a00;
+  --color-primary-800: #6f4d00;
+  --color-primary-900: #483100;
 
   /* Warm Neutrals */
   --color-surface-50: #fefdfb;
@@ -34,27 +35,20 @@
   --color-ink-500: #64748b;
   --color-ink-600: #475569;
   --color-ink-700: #334155;
-  --color-ink-800: #1e293b;
-  --color-ink-900: #0f172a;
+  --color-ink-800: #1e1e1e;
+  --color-ink-900: #1e1e1e;
+  --color-ink-950: #1e1e1e;
 
   /* Semantic Colors */
   --color-success: #059669;
-  --color-warning: #d97706;
+  --color-warning: #ffc943;
   --color-danger: #dc2626;
   --color-info: #2563eb;
 
   /* Score Colors */
   --color-score-low: #059669;
-  --color-score-mid: #d97706;
+  --color-score-mid: #ffc943;
   --color-score-high: #dc2626;
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
 }
 
 @font-face {
@@ -70,7 +64,7 @@
 }
 
 html {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Epilogue', system-ui, -apple-system, sans-serif;
 }
 
 body {

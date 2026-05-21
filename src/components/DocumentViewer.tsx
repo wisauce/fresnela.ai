@@ -20,7 +20,7 @@ function VersionTimeline({ versions, selectedDate, onDateChange }: { versions: M
           <button key={version.id} onClick={() => onDateChange(version.date)} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium whitespace-nowrap transition-all ${
             isCurrent ? "bg-primary-500 text-white shadow-sm" : selectedDate >= version.date ? "bg-primary-100 text-primary-700" : "bg-surface-100 text-ink-500 hover:bg-surface-200"
           }`} title={version.description}>
-            <span className={`w-1.5 h-1.5 rounded-full ${version.changeType === "enacted" ? "bg-emerald-400" : version.changeType === "amended" ? "bg-amber-400" : "bg-blue-400"}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${version.changeType === "enacted" ? "bg-emerald-400" : version.changeType === "amended" ? "bg-primary-400" : "bg-blue-400"}`} />
             {version.label}
             {i < versions.length - 1 && <ChevronRight className="w-3 h-3 text-ink-300 ml-0.5" />}
           </button>
@@ -43,7 +43,7 @@ function ParagraphBlock({ paragraph, isActive }: { paragraph: ConsolidatedParagr
         {paragraph.linkedIndicators.map((ind) => (
           <span key={ind} className="text-[9px] px-1.5 py-0.5 bg-primary-100 text-primary-700 rounded font-medium flex items-center gap-0.5"><Link2 className="w-2.5 h-2.5" />{ind}</span>
         ))}
-        {paragraph.isAmended && <span className="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded">amended</span>}
+        {paragraph.isAmended && <span className="text-[9px] px-1.5 py-0.5 bg-primary-50 text-primary-700 rounded">amended</span>}
       </div>
     </motion.div>
   );
@@ -82,6 +82,14 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
 
       <div className="flex-1 overflow-y-auto px-8 py-6">
         <div className="max-w-3xl mx-auto space-y-8">
+          {!activeParagraphId && (
+            <div className="rounded-xl border border-dashed border-surface-300 bg-surface-50 px-5 py-6 text-center">
+              <FileText className="mx-auto h-6 w-6 text-ink-300" />
+              <p className="mt-2 text-sm font-medium text-ink-700">Select a paragraph to view its source and scoring rationale.</p>
+              <p className="mt-1 text-xs text-ink-500">Click linked evidence from a subpillar card to highlight its source clause here.</p>
+            </div>
+          )}
+
           {measure.sections.map((section) => {
             const visible = section.paragraphs.filter(isParagraphVisible);
             if (visible.length === 0) return null;

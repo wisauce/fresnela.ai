@@ -14,7 +14,7 @@ interface MeasureEditorProps {
 function SourceDocumentSelector({ documents, activeDocId, onSelect }: { documents: SourceDocument[]; activeDocId: string | null; onSelect: (doc: SourceDocument) => void }) {
   const [open, setOpen] = useState(false);
   const activeDoc = documents.find((d) => d.id === activeDocId);
-  const typeColors: Record<string, string> = { base: "bg-emerald-100 text-emerald-700", amendment: "bg-amber-100 text-amber-700", implementing_regulation: "bg-blue-100 text-blue-700", treaty: "bg-purple-100 text-purple-700", court_decision: "bg-pink-100 text-pink-700" };
+  const typeColors: Record<string, string> = { base: "bg-emerald-100 text-emerald-700", amendment: "bg-primary-100 text-primary-700", implementing_regulation: "bg-blue-100 text-blue-700", treaty: "bg-purple-100 text-purple-700", court_decision: "bg-pink-100 text-pink-700" };
 
   return (
     <div className="relative">
@@ -54,7 +54,7 @@ function ConsolidatedParagraphItem({ paragraph, isActive, onClick }: { paragraph
         {paragraph.linkedIndicators.map((ind) => (
           <span key={ind} className="text-[9px] px-1.5 py-0.5 bg-primary-100 text-primary-700 rounded font-medium flex items-center gap-0.5"><Link2 className="w-2.5 h-2.5" />{ind}</span>
         ))}
-        {paragraph.isAmended && <span className="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded">amended</span>}
+        {paragraph.isAmended && <span className="text-[9px] px-1.5 py-0.5 bg-primary-50 text-primary-700 rounded">amended</span>}
       </div>
     </motion.button>
   );
@@ -122,7 +122,7 @@ function SourceDocumentViewer({ document, activeParagraph }: { document: SourceD
         )}
         {activeParagraph && matchIndex === -1 && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden shrink-0">
-            <div className="px-4 py-1.5 bg-amber-50 border-b border-amber-200 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 text-amber-600" /><span className="text-[11px] text-amber-800 font-medium">Exact match not found — may need manual verification</span></div>
+            <div className="px-4 py-1.5 bg-primary-50 border-b border-primary-200 flex items-center gap-2"><AlertTriangle className="w-3.5 h-3.5 text-primary-700" /><span className="text-[11px] text-primary-800 font-medium">Exact match not found — may need manual verification</span></div>
           </motion.div>
         )}
       </AnimatePresence>
