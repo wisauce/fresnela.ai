@@ -23,7 +23,7 @@ function AlertCard({ alert, index }: { alert: WorkspaceAlert; index: number }) {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
-      className="rounded-xl border border-surface-200 bg-white px-4 py-3 shadow-sm"
+      className="interactive-surface rounded-xl border border-surface-200 bg-comfort px-4 py-3 shadow-sm"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-2.5">
@@ -76,7 +76,7 @@ export function AlertsPanel({ workspaceName, alerts }: AlertsPanelProps) {
           ))}
         </section>
       ) : (
-        <section className="rounded-xl border border-dashed border-surface-300 bg-white px-6 py-12 text-center">
+        <section className="rounded-xl border border-dashed border-surface-300 bg-comfort px-6 py-12 text-center">
           <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-500" />
           <h2 className="mt-3 text-sm font-semibold text-ink-800">No workspace alerts</h2>
           <p className="mt-1 text-sm text-ink-500">This workspace has no unresolved warnings or review items.</p>

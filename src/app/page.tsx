@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, Play, CheckCircle2 } from "lucide-react";
+import { Loader2, Play, CheckCircle2, Pencil } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
 import { WorkspacePillarsPanel } from "@/components/WorkspacePillarsPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
@@ -27,6 +27,8 @@ export default function Home() {
   const [isScoringRunning, setIsScoringRunning] = useState(false);
   const [scoringMessage, setScoringMessage] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState("2026-01-10 14:30");
+  const [modeTransitionStatus, setModeTransitionStatus] = useState<"entering-edit" | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | null>(null);
 
   const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
 
@@ -54,6 +56,16 @@ export default function Home() {
 
   const handleWorkspaceModeChange = (mode: "view" | "edit") => {
     setActiveView("workspace");
+    if (mode === "edit" && workspaceMode !== "edit") {
+      setModeTransitionStatus("entering-edit");
+      window.setTimeout(() => {
+        setWorkspaceMode("edit");
+        setModeTransitionStatus(null);
+      }, 750);
+      return;
+    }
+
+    setModeTransitionStatus(null);
     setWorkspaceMode(mode);
   };
 
@@ -65,7 +77,12 @@ export default function Home() {
 
   const handleSaveChanges = () => {
     // TODO: Persist measure edits through the backend/API when editing is connected to real data.
-    setHasUnsavedChanges(false);
+    setSaveStatus("saving");
+    window.setTimeout(() => {
+      setHasUnsavedChanges(false);
+      setSaveStatus("saved");
+      window.setTimeout(() => setSaveStatus(null), 1600);
+    }, 850);
   };
 
   return (
@@ -90,6 +107,8 @@ export default function Home() {
           workspaceMode={workspaceMode}
           hasUnsavedChanges={hasUnsavedChanges}
           lastUpdated={lastUpdated}
+          modeTransitionStatus={modeTransitionStatus}
+          saveStatus={saveStatus}
           onWorkspaceModeChange={handleWorkspaceModeChange}
           onCancelChanges={handleCancelChanges}
           onSaveChanges={handleSaveChanges}
@@ -104,10 +123,36 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex h-full flex-col"
+                className="relative flex h-full flex-col"
               >
+                <AnimatePresence>
+                  {modeTransitionStatus === "entering-edit" && (
+                    <motion.div
+                      key="entering-edit"
+                      initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                      animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
+                      exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute inset-0 z-20 flex items-center justify-center bg-comfort/65"
+                    >
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -4, scale: 0.98 }}
+                        className="flex items-center gap-3 rounded-xl border border-surface-200 bg-comfort px-4 py-3 text-sm font-semibold text-ink-800 shadow-lg"
+                      >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </span>
+                        <span>Entering edit mode...</span>
+                        <Pencil className="h-4 w-4 text-ink-400" />
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {workspaceMode === "view" && (
-                  <div className="flex items-center justify-between gap-4 border-b border-surface-200 bg-white px-4 py-3">
+                  <div className="flex items-center justify-between gap-4 border-b border-surface-200 bg-comfort px-4 py-3">
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-ink-900">RDTII Subpillar Scoring</p>
                       <p className="mt-0.5 text-xs text-ink-500">
@@ -118,7 +163,7 @@ export default function Home() {
                       type="button"
                       onClick={handleRunScoring}
                       disabled={isScoringRunning}
-                      className="flex shrink-0 items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-ink-900 transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
+                      className="interactive-control flex shrink-0 items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-ink-900 transition-colors hover:bg-primary-600 disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isScoringRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : scoringMessage === "Scoring updated" ? <CheckCircle2 className="h-4 w-4" /> : <Play className="h-4 w-4" />}
                       {isScoringRunning ? "Running scoring..." : scoringMessage === "Scoring updated" ? "Scoring updated" : "Run Scoring"}

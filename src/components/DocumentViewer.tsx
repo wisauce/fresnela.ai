@@ -58,8 +58,8 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-white">
-      <div className="px-5 py-3 border-b border-surface-200 bg-surface-50/50 shrink-0">
+    <div className="flex-1 flex flex-col overflow-hidden bg-comfort">
+      <div className="px-5 py-3 border-b border-surface-200 bg-comfort-hover/70 shrink-0">
         <div className="flex items-center gap-2 mb-1"><FileText className="w-4 h-4 text-primary-600" /><h3 className="text-sm font-semibold text-ink-800">{measure.title}</h3></div>
         <p className="text-[11px] text-ink-500 ml-6">{measure.subtitle}</p>
         <div className="mt-2 ml-6 flex items-center gap-2">
@@ -80,7 +80,7 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
         )}
       </AnimatePresence>
 
-      <div className="flex-1 overflow-y-auto px-8 py-6">
+      <div className="flex-1 overflow-y-auto px-8 py-6 bg-comfort">
         <div className="max-w-3xl mx-auto space-y-8">
           {!activeParagraphId && (
             <div className="rounded-xl border border-dashed border-surface-300 bg-surface-50 px-5 py-6 text-center">

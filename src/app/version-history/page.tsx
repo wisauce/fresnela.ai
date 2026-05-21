@@ -42,10 +42,10 @@ export default function VersionHistoryPage() {
           onSaveChanges={() => undefined}
         />
 
-        <main className="relative z-0 flex-1 overflow-hidden bg-surface-50">
+        <main className="relative z-0 flex-1 overflow-hidden bg-comfort">
           <div className="flex h-full">
-            <aside className="w-80 shrink-0 overflow-y-auto border-r border-surface-200 bg-white">
-              <div className="sticky top-0 border-b border-surface-200 bg-white px-4 py-4">
+            <aside className="w-80 shrink-0 overflow-y-auto border-r border-surface-200 bg-comfort">
+              <div className="sticky top-0 border-b border-surface-200 bg-comfort px-4 py-4">
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-primary-600" />
                   <h2 className="text-sm font-semibold text-ink-900">Versions</h2>
@@ -61,10 +61,10 @@ export default function VersionHistoryPage() {
                       key={item.id}
                       type="button"
                       onClick={() => setSelectedVersionId(item.id)}
-                      className={`mb-2 w-full rounded-lg border p-3 text-left transition-colors ${
+                      className={`interactive-control mb-2 w-full rounded-lg border p-3 text-left transition-colors ${
                         isSelected
                           ? "border-primary-300 bg-primary-50 ring-1 ring-primary-200"
-                          : "border-surface-200 bg-white hover:bg-surface-50"
+                          : "border-surface-200 bg-comfort hover:bg-comfort-hover"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
@@ -93,7 +93,7 @@ export default function VersionHistoryPage() {
                   </p>
                 </div>
 
-                <article className="rounded-xl border border-surface-200 bg-white shadow-sm">
+                <article className="rounded-xl border border-surface-200 bg-comfort shadow-sm">
                   <div className="border-b border-surface-200 px-5 py-4">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-primary-600" />
@@ -135,11 +135,11 @@ export default function VersionHistoryPage() {
                     </div>
                   </div>
 
-                  <div className="flex justify-end border-t border-surface-200 bg-white px-5 py-4">
+                  <div className="flex justify-end border-t border-surface-200 bg-comfort px-5 py-4">
                     {/* TODO: Wire restore to backend version restoration when persistence exists. */}
                     <button
                       type="button"
-                      className="flex items-center gap-2 rounded-lg border border-surface-200 px-4 py-2 text-sm font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400/50"
+                      className="interactive-control flex items-center gap-2 rounded-lg border border-surface-200 px-4 py-2 text-sm font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus-visible:bg-primary-50"
                     >
                       <RotateCcw className="h-4 w-4" />
                       Restore this version

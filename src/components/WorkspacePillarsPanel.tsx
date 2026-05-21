@@ -132,7 +132,6 @@ function EvidenceItem({ evidence, isActive, onClick }: { evidence: LinkedEvidenc
     <motion.button
       type="button"
       onClick={onClick}
-      whileHover={{ x: 2 }}
       className={`w-full rounded-lg border p-2.5 text-left transition-all group ${
         isActive
           ? "bg-primary-100 border-primary-300 shadow-sm ring-1 ring-primary-200"
@@ -159,14 +158,14 @@ function SubpillarItem({ indicator, activeParagraphId, onEvidenceClick, isScorin
   return (
     <motion.div
       layout
-      className={`overflow-hidden rounded-xl border bg-white transition-shadow ${
-        hasActiveEvidence ? "border-primary-300 shadow-md ring-1 ring-primary-100" : "border-surface-200 hover:shadow-sm"
+      className={`interactive-surface overflow-hidden rounded-xl border bg-comfort ${
+        hasActiveEvidence ? "border-primary-300 shadow-md ring-1 ring-primary-100" : "border-surface-200"
       }`}
     >
       <button
         type="button"
         onClick={() => setExpanded((open) => !open)}
-        className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-50/50"
+        className="interactive-control flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-comfort-hover"
       >
         <div className="shrink-0">{expanded ? <ChevronDown className="h-4 w-4 text-ink-400" /> : <ChevronRight className="h-4 w-4 text-ink-400" />}</div>
         <div className="min-w-0 flex-1">
@@ -237,11 +236,11 @@ function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceCli
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section className="overflow-hidden rounded-xl border border-surface-200 bg-surface-50 shadow-sm">
+    <section className="interactive-surface overflow-hidden rounded-xl border border-surface-200 bg-comfort shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="flex w-full items-center gap-3 bg-white px-4 py-3 text-left transition-colors hover:bg-surface-50"
+        className="interactive-control flex w-full items-center gap-3 bg-comfort px-4 py-3 text-left transition-colors hover:bg-comfort-hover"
       >
         {open ? <ChevronDown className="h-4 w-4 text-ink-400" /> : <ChevronRight className="h-4 w-4 text-ink-400" />}
         <div className="min-w-0 flex-1">
@@ -291,12 +290,7 @@ function PillarAccordion({ pillar, defaultOpen, activeParagraphId, onEvidenceCli
 
 export function WorkspacePillarsPanel({ countryData, onEvidenceClick, activeParagraphId, isScoringLoading = false }: WorkspacePillarsPanelProps) {
   return (
-    <div className="w-[480px] shrink-0 overflow-y-auto border-r border-surface-200 bg-surface-50 p-3">
-      <div className="mb-3 rounded-xl border border-surface-200 bg-white px-4 py-3">
-        <h1 className="text-sm font-semibold text-ink-900">RDTII Pillars</h1>
-        <p className="mt-0.5 text-[11px] text-ink-500">Review Pillar 6 and Pillar 7 subpillars with linked regulatory evidence.</p>
-      </div>
-
+    <div className="w-[480px] shrink-0 overflow-y-auto border-r border-surface-200 bg-comfort p-3">
       <div className="space-y-3">
         {countryData.pillars.map((pillar) => (
           <PillarAccordion

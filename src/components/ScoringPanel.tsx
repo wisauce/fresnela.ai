@@ -21,7 +21,7 @@ function ScoreBadge({ score }: { score: number }) {
 
 function EvidenceItem({ evidence, isActive, onClick }: { evidence: LinkedEvidence; isActive: boolean; onClick: () => void }) {
   return (
-    <motion.button onClick={onClick} whileHover={{ x: 2 }} className={`w-full text-left p-2.5 rounded-lg border transition-all group ${
+    <motion.button onClick={onClick} className={`w-full text-left p-2.5 rounded-lg border transition-all group ${
       isActive ? "bg-primary-100 border-primary-300 shadow-sm ring-1 ring-primary-200" : "bg-primary-50/30 border-primary-100/50 hover:bg-primary-50 hover:border-primary-200"
     }`}>
       <div className="flex items-start gap-2">
@@ -42,10 +42,10 @@ function IndicatorCard({ indicator, onEvidenceClick, activeParagraphId }: { indi
   const hasActiveEvidence = indicator.evidence.some((ev) => ev.paragraphId === activeParagraphId);
 
   return (
-    <motion.div layout className={`border rounded-xl overflow-hidden bg-white transition-shadow ${
-      hasActiveEvidence ? "border-primary-300 shadow-md ring-1 ring-primary-100" : "border-surface-200 hover:shadow-sm"
+    <motion.div layout className={`interactive-surface border rounded-xl overflow-hidden bg-comfort ${
+      hasActiveEvidence ? "border-primary-300 shadow-md ring-1 ring-primary-100" : "border-surface-200"
     }`}>
-      <button onClick={() => setExpanded(!expanded)} className="w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-surface-50/50 transition-colors">
+      <button onClick={() => setExpanded(!expanded)} className="interactive-control w-full px-4 py-3 flex items-center gap-3 text-left hover:bg-comfort-hover transition-colors">
         <div className="shrink-0">{expanded ? <ChevronDown className="w-4 h-4 text-ink-400" /> : <ChevronRight className="w-4 h-4 text-ink-400" />}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -96,8 +96,8 @@ function IndicatorCard({ indicator, onEvidenceClick, activeParagraphId }: { indi
 
 export function ScoringPanel({ pillar, onEvidenceClick, activeParagraphId }: ScoringPanelProps) {
   return (
-    <div className="w-[440px] flex flex-col overflow-hidden border-r border-surface-200 bg-surface-50 shrink-0">
-      <div className="px-4 py-3 bg-white border-b border-surface-200 shrink-0">
+    <div className="w-[440px] flex flex-col overflow-hidden border-r border-surface-200 bg-comfort shrink-0">
+      <div className="px-4 py-3 bg-comfort border-b border-surface-200 shrink-0">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2">

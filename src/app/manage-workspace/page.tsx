@@ -72,7 +72,7 @@ function OpenWorkspaceButton() {
     // TODO: Navigate to a workspace detail route when that frontend route exists.
     <button
       type="button"
-      className="rounded-lg border border-surface-200 px-3 py-1.5 text-xs font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400/50"
+      className="interactive-control rounded-lg border border-surface-200 px-3 py-1.5 text-xs font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus-visible:bg-primary-50"
     >
       Open Workspace
     </button>
@@ -81,7 +81,7 @@ function OpenWorkspaceButton() {
 
 function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem; attentionCount: number }) {
   return (
-    <article className="flex min-h-[210px] flex-col rounded-xl border border-surface-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
+    <article className="interactive-surface flex min-h-[210px] flex-col rounded-xl border border-surface-200 bg-comfort p-3 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2.5">
@@ -97,9 +97,6 @@ function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem
             </div>
           </div>
         </div>
-        <div className="shrink-0">
-          <AttentionBadge count={attentionCount} />
-        </div>
       </div>
 
       <div className="mt-3 flex min-h-6 items-center justify-between gap-2">
@@ -107,9 +104,6 @@ function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem
           {workspace.activePillars.map((pillar) => (
             <PillarPill key={pillar} pillar={pillar} />
           ))}
-        </div>
-        <div className="shrink-0">
-          <StatusBadge status={workspace.status} />
         </div>
       </div>
 
@@ -121,7 +115,9 @@ function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem
           </div>
           <p className="truncate">Updated {workspace.lastUpdated}</p>
         </div>
-        <div className="shrink-0">
+        <div className="flex shrink-0 flex-col items-end gap-2">
+          <StatusBadge status={workspace.status} />
+          <AttentionBadge count={attentionCount} />
           <OpenWorkspaceButton />
         </div>
       </div>
@@ -131,7 +127,7 @@ function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem
 
 function WorkspaceRow({ workspace, attentionCount }: { workspace: WorkspaceItem; attentionCount: number }) {
   return (
-    <tr className="border-b border-surface-100 last:border-0">
+    <tr className="border-b border-surface-100 transition-colors hover:bg-comfort-hover last:border-0">
       <td className="min-w-[260px] px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-100 text-sm font-bold text-primary-700">
@@ -198,7 +194,7 @@ export default function ManageWorkspacePage() {
   };
 
   return (
-    <main className="h-full overflow-y-auto bg-surface-50 px-4 py-6 sm:px-6 lg:px-8">
+    <main className="h-full overflow-y-auto bg-comfort px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="flex flex-col gap-4 border-b border-surface-200 pb-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -207,12 +203,12 @@ export default function ManageWorkspacePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex rounded-lg border border-surface-200 bg-white p-1">
+            <div className="flex rounded-lg border border-surface-200 bg-comfort-hover p-1">
               <button
                 type="button"
                 onClick={() => setViewMode("list")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                  viewMode === "list" ? "bg-primary-100 text-primary-700" : "text-ink-500 hover:bg-surface-50"
+              className={`interactive-control flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  viewMode === "list" ? "bg-primary-100 text-primary-700" : "text-ink-500 hover:bg-comfort-hover"
                 }`}
               >
                 <List className="h-3.5 w-3.5" />
@@ -221,8 +217,8 @@ export default function ManageWorkspacePage() {
               <button
                 type="button"
                 onClick={() => setViewMode("grid")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                  viewMode === "grid" ? "bg-primary-100 text-primary-700" : "text-ink-500 hover:bg-surface-50"
+              className={`interactive-control flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+                  viewMode === "grid" ? "bg-primary-100 text-primary-700" : "text-ink-500 hover:bg-comfort-hover"
                 }`}
               >
                 <Grid2X2 className="h-3.5 w-3.5" />
@@ -233,7 +229,7 @@ export default function ManageWorkspacePage() {
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-primary-700 shadow-sm transition-colors hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-400/60"
+              className="interactive-control flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-primary-700 shadow-sm transition-colors hover:bg-primary-600 focus:outline-none focus-visible:bg-primary-600"
             >
               <Plus className="h-4 w-4 text-primary-700" />
               Add Workspace
@@ -242,7 +238,7 @@ export default function ManageWorkspacePage() {
         </section>
 
         {viewMode === "list" ? (
-          <section className="overflow-x-auto rounded-xl border border-surface-200 bg-white shadow-sm">
+          <section className="overflow-x-auto rounded-xl border border-surface-200 bg-comfort shadow-sm">
             <table className="min-w-full border-collapse">
               <thead>
                 <tr className="border-b border-surface-200 bg-surface-50 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-500">
@@ -272,7 +268,7 @@ export default function ManageWorkspacePage() {
 
       {modalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-ink-900/45 px-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl border border-surface-200 bg-white shadow-2xl">
+          <div className="w-full max-w-md rounded-xl border border-surface-200 bg-comfort shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-surface-200 px-5 py-4">
               <div>
                 <h2 className="text-base font-semibold text-ink-900">Add New Workspace</h2>
@@ -282,7 +278,7 @@ export default function ManageWorkspacePage() {
                 type="button"
                 onClick={() => setModalOpen(false)}
                 aria-label="Close modal"
-                className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-surface-100 hover:text-ink-700 focus:outline-none focus:ring-2 focus:ring-primary-400/50"
+                className="interactive-control rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-surface-100 hover:text-ink-700 focus:outline-none focus-visible:bg-surface-100"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -326,14 +322,14 @@ export default function ManageWorkspacePage() {
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-ink-600 transition-colors hover:bg-surface-100 focus:outline-none focus:ring-2 focus:ring-primary-400/50"
+                className="interactive-control rounded-lg px-4 py-2 text-sm font-medium text-ink-600 transition-colors hover:bg-surface-100 focus:outline-none focus-visible:bg-surface-100"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleAddWorkspace}
-                className="rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-400/60"
+                className="interactive-control rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-600 focus:outline-none focus-visible:bg-primary-600"
               >
                 Add Workspace
               </button>
