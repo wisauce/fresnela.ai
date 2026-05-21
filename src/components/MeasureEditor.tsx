@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Link2, ExternalLink, Edit3, CheckCircle2, AlertTriangle, ChevronDown, GitBranch, Layers, Languages } from "lucide-react";
+import { FileText, Link2, ExternalLink, Edit3, CheckCircle2, AlertTriangle, ChevronDown, Layers, Languages } from "lucide-react";
 import type { ConsolidatedMeasure, ConsolidatedParagraph, SourceDocument } from "@/data/dummy";
 
 interface MeasureEditorProps {
   measure: ConsolidatedMeasure;
   sourceDocuments: SourceDocument[];
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
 function SourceDocumentSelector({ documents, activeDocId, onSelect }: { documents: SourceDocument[]; activeDocId: string | null; onSelect: (doc: SourceDocument) => void }) {
@@ -131,11 +132,12 @@ function SourceDocumentViewer({ document, activeParagraph }: { document: SourceD
   );
 }
 
-export function MeasureEditor({ measure, sourceDocuments }: MeasureEditorProps) {
+export function MeasureEditor({ measure, sourceDocuments, onDirtyChange }: MeasureEditorProps) {
   const [activeParagraph, setActiveParagraph] = useState<ConsolidatedParagraph | null>(null);
   const [activeSourceDoc, setActiveSourceDoc] = useState<SourceDocument | null>(null);
 
   const handleParagraphClick = (paragraph: ConsolidatedParagraph) => {
+    onDirtyChange?.(true);
     setActiveParagraph(paragraph);
     const doc = sourceDocuments.find((d) => d.id === paragraph.sourceDocumentId);
     if (doc) setActiveSourceDoc(doc);
@@ -147,11 +149,6 @@ export function MeasureEditor({ measure, sourceDocuments }: MeasureEditorProps) 
         <div className="px-4 py-3 bg-white border-b border-surface-200 shrink-0">
           <div className="flex items-center gap-2 mb-1"><Edit3 className="w-4 h-4 text-primary-600" /><h2 className="text-sm font-semibold text-ink-800">Consolidated Measure</h2></div>
           <p className="text-[11px] text-ink-500 ml-6">Click a paragraph to view its source provision →</p>
-          <div className="mt-2 ml-6 flex items-center gap-2">
-            <GitBranch className="w-3 h-3 text-ink-400" /><span className="text-[10px] text-ink-500">{measure.versions.length} versions</span>
-            <span className="text-[10px] text-ink-400">·</span><span className="text-[10px] text-ink-500">{measure.sourceDocuments.length} sources</span>
-            <span className="text-[10px] text-ink-400">·</span><span className="text-[10px] text-ink-500">Updated: {measure.lastUpdated}</span>
-          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-5">
           {measure.sections.map((section) => (
@@ -167,7 +164,7 @@ export function MeasureEditor({ measure, sourceDocuments }: MeasureEditorProps) 
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="px-4 py-2.5 border-b border-surface-200 bg-surface-50/50 shrink-0">
-          <SourceDocumentSelector documents={sourceDocuments} activeDocId={activeSourceDoc?.id || null} onSelect={(doc) => { setActiveSourceDoc(doc); setActiveParagraph(null); }} />
+          <SourceDocumentSelector documents={sourceDocuments} activeDocId={activeSourceDoc?.id || null} onSelect={(doc) => { onDirtyChange?.(true); setActiveSourceDoc(doc); setActiveParagraph(null); }} />
         </div>
         <SourceDocumentViewer document={activeSourceDoc} activeParagraph={activeParagraph} />
       </div>

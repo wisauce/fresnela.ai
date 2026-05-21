@@ -1,26 +1,33 @@
 "use client";
 
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
+  Clock,
+  BriefcaseBusiness,
+  Check,
+  ChevronDown,
   AlertTriangle,
+  LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  Database,
-  Shield,
-  FilePenLine,
 } from "lucide-react";
-import type { CountryData, PillarData } from "@/data/dummy";
+import type { CountryData } from "@/data/dummy";
 
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   activeView: string;
-  onViewChange: (view: "workspace" | "editor" | "alerts") => void;
+  onViewChange: (view: "workspace") => void;
   countryData: CountryData;
-  selectedPillar: PillarData;
-  onPillarSelect: (pillar: PillarData) => void;
+  selectedWorkspace: string;
+  onWorkspaceChange: (workspace: string) => void;
+  alertCount: number;
+  onAlertsClick: () => void;
 }
+
+const workspaceOptions = ["Indonesia", "Singapore", "Malaysia", "Thailand"];
 
 export function Sidebar({
   collapsed,
@@ -28,19 +35,16 @@ export function Sidebar({
   activeView,
   onViewChange,
   countryData,
-  selectedPillar,
-  onPillarSelect,
+  selectedWorkspace,
+  onWorkspaceChange,
+  alertCount,
+  onAlertsClick,
 }: SidebarProps) {
+  const [workspaceOpen, setWorkspaceOpen] = useState(false);
+
   const navItems = [
     { id: "workspace" as const, icon: LayoutDashboard, label: "Workspace" },
-    { id: "editor" as const, icon: FilePenLine, label: "Measure Editor" },
-    { id: "alerts" as const, icon: AlertTriangle, label: "Alerts" },
   ];
-
-  const pillarIcons: Record<string, typeof Database> = {
-    "pillar-6": Database,
-    "pillar-7": Shield,
-  };
 
   return (
     <motion.aside
@@ -48,18 +52,95 @@ export function Sidebar({
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="h-full bg-ink-900 text-white flex flex-col shrink-0 relative"
     >
-      {/* Logo */}
-      <div className="h-14 flex items-center px-4 border-b border-ink-700/50">
-        <div className="flex items-center gap-2 overflow-hidden">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-white">R</span>
+      {/* Workspace Switcher */}
+      <div className="relative border-b border-ink-700/50 p-3">
+        <button
+          type="button"
+          onClick={() => !collapsed && setWorkspaceOpen((open) => !open)}
+          className={`flex w-full items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors ${
+            collapsed ? "justify-center" : "hover:bg-ink-800"
+          }`}
+        >
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-400 to-primary-600">
+            <BriefcaseBusiness className="h-4 w-4 text-white" />
           </div>
           {!collapsed && (
-            <div className="whitespace-nowrap">
-              <p className="text-sm font-semibold text-white">RDTII</p>
-              <p className="text-[10px] text-ink-400">Evidence Workspace</p>
-            </div>
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-white">{selectedWorkspace}</p>
+                <p className="truncate text-[10px] text-ink-400">Evidence Workspace</p>
+              </div>
+              <ChevronDown className={`h-4 w-4 shrink-0 text-ink-400 transition-transform ${workspaceOpen ? "rotate-180" : ""}`} />
+            </>
           )}
+        </button>
+
+        {!collapsed && workspaceOpen && (
+          <div className="absolute left-3 right-3 top-[58px] z-20 overflow-hidden rounded-xl border border-ink-700 bg-ink-900 shadow-xl">
+            {workspaceOptions.map((workspace) => (
+              <button
+                key={workspace}
+                type="button"
+                onClick={() => {
+                  onWorkspaceChange(workspace);
+                  setWorkspaceOpen(false);
+                }}
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-ink-800"
+              >
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-ink-800 text-[10px] font-bold text-primary-300">
+                  {workspace.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-white">{workspace}</p>
+                  <p className="truncate text-[10px] text-ink-500">Evidence Workspace</p>
+                </div>
+                {selectedWorkspace === workspace && <Check className="h-4 w-4 text-primary-400" />}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="border-b border-ink-700/50 px-2 py-3">
+        <div className="space-y-1">
+          <button
+            type="button"
+            onClick={onAlertsClick}
+            className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
+              activeView === "alerts"
+                ? "bg-primary-500/20 text-primary-300"
+                : "text-ink-300 hover:bg-ink-800 hover:text-white"
+            }`}
+          >
+            <span className="relative shrink-0">
+              <AlertTriangle className="h-5 w-5" />
+              {collapsed && alertCount > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary-500 px-1 text-[10px] font-bold leading-none text-white">
+                  {alertCount}
+                </span>
+              )}
+            </span>
+            {!collapsed && (
+              <>
+                <span className="text-sm font-medium">Alerts</span>
+                <span className="ml-auto rounded-full bg-primary-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {alertCount}
+                </span>
+              </>
+            )}
+          </button>
+
+          <Link
+            href="/version-history"
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
+              activeView === "version-history"
+                ? "bg-primary-500/20 text-primary-300"
+                : "text-ink-300 hover:bg-ink-800 hover:text-white"
+            }`}
+          >
+            <Clock className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="text-sm font-medium">Version History</span>}
+          </Link>
         </div>
       </div>
 
@@ -92,50 +173,11 @@ export function Sidebar({
           })}
         </div>
 
-        {/* Pillar Selector */}
-        {!collapsed && (
-          <div className="mt-6 pt-4 border-t border-ink-700/50">
-            <p className="px-3 text-[11px] font-semibold text-ink-500 uppercase tracking-wider mb-2">
-              Active Pillars
-            </p>
-            <div className="space-y-1">
-              {countryData.pillars.map((pillar) => {
-                const Icon = pillarIcons[pillar.id] || Database;
-                const isSelected = selectedPillar.id === pillar.id;
-                return (
-                  <motion.button
-                    key={pillar.id}
-                    whileHover={{ x: 2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => onPillarSelect(pillar)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
-                      isSelected
-                        ? "bg-primary-500/10 text-primary-300 border border-primary-500/30"
-                        : "text-ink-400 hover:bg-ink-800 hover:text-ink-200"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    <div className="text-left overflow-hidden">
-                      <p className="text-xs font-medium truncate">Pillar {pillar.number}</p>
-                      <p className="text-[10px] text-ink-500 truncate">{pillar.name}</p>
-                    </div>
-                    <span className={`ml-auto text-xs font-mono font-bold shrink-0 ${
-                      pillar.weightedScore >= 0.7 ? "text-red-400" :
-                      pillar.weightedScore >= 0.4 ? "text-amber-400" : "text-emerald-400"
-                    }`}>
-                      {pillar.weightedScore.toFixed(2)}
-                    </span>
-                  </motion.button>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Overall Score */}
-      {!collapsed && (
-        <div className="p-4 border-t border-ink-700/50">
+      <div className="border-t border-ink-700/50 p-4">
+        {!collapsed ? (
           <div className="bg-ink-800 rounded-xl p-3">
             <p className="text-[10px] text-ink-500 uppercase tracking-wider mb-1">Overall RDTII Score</p>
             <div className="flex items-end gap-2">
@@ -151,8 +193,14 @@ export function Sidebar({
               />
             </div>
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex justify-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary-500/20 bg-ink-800 text-[11px] font-bold text-primary-400">
+              {countryData.overallScore.toFixed(2)}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Collapse Toggle */}
       <button

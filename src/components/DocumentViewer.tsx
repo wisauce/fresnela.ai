@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, FileText, Link2, X, GitBranch, Calendar, ChevronRight } from "lucide-react";
+import { FileText, Link2, X, GitBranch, Calendar, ChevronRight } from "lucide-react";
 import type { ConsolidatedMeasure, ConsolidatedParagraph, MeasureVersion } from "@/data/dummy";
 
 interface DocumentViewerProps {
@@ -94,12 +94,6 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
             );
           })}
         </div>
-      </div>
-
-      <div className="px-5 py-2 border-t border-surface-200 bg-surface-50/50 flex items-center gap-3 shrink-0">
-        <Clock className="w-3 h-3 text-ink-400" /><span className="text-[10px] text-ink-500">Last updated: {measure.lastUpdated}</span>
-        <span className="text-[10px] text-ink-400">·</span><span className="text-[10px] text-ink-500">{measure.sourceDocuments.length} source documents</span>
-        <span className="text-[10px] text-ink-400">·</span><span className="text-[10px] text-ink-500">{measure.versions.length} versions</span>
       </div>
     </div>
   );

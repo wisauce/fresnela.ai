@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/Sidebar";
-import { ScoringPanel } from "@/components/ScoringPanel";
+import { WorkspacePillarsPanel } from "@/components/WorkspacePillarsPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { MeasureEditor } from "@/components/MeasureEditor";
 import { AlertsPanel } from "@/components/AlertsPanel";
@@ -12,21 +12,42 @@ import {
   indonesiaData,
   consolidatedMeasure,
   sourceDocuments,
-  regulationAlerts,
 } from "@/data/dummy";
+import { workspaceAlerts } from "@/data/workspaceAlerts";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<"workspace" | "editor" | "alerts">("workspace");
-  const [selectedPillar, setSelectedPillar] = useState(indonesiaData.pillars[0]);
+  const [activeView, setActiveView] = useState<"workspace" | "alerts">("workspace");
+  const [workspaceMode, setWorkspaceMode] = useState<"view" | "edit">("view");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [editorSessionKey, setEditorSessionKey] = useState(0);
+  const [selectedWorkspace, setSelectedWorkspace] = useState("Indonesia");
   const [activeParagraphId, setActiveParagraphId] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
 
   const handleEvidenceClick = (paragraphId: string) => {
     setActiveParagraphId(paragraphId);
   };
 
+  const handleWorkspaceModeChange = (mode: "view" | "edit") => {
+    setActiveView("workspace");
+    setWorkspaceMode(mode);
+  };
+
+  const handleCancelChanges = () => {
+    // TODO: Replace this local reset with backend-backed draft discard when persistence exists.
+    setHasUnsavedChanges(false);
+    setEditorSessionKey((key) => key + 1);
+  };
+
+  const handleSaveChanges = () => {
+    // TODO: Persist measure edits through the backend/API when editing is connected to real data.
+    setHasUnsavedChanges(false);
+  };
+
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-full overflow-hidden">
       {/* Sidebar */}
       <Sidebar
         collapsed={sidebarCollapsed}
@@ -34,16 +55,21 @@ export default function Home() {
         activeView={activeView}
         onViewChange={setActiveView}
         countryData={indonesiaData}
-        selectedPillar={selectedPillar}
-        onPillarSelect={setSelectedPillar}
+        selectedWorkspace={selectedWorkspace}
+        onWorkspaceChange={setSelectedWorkspace}
+        alertCount={currentWorkspaceAlerts.length}
+        onAlertsClick={() => setActiveView("alerts")}
       />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar
-          countryData={indonesiaData}
-          activeView={activeView}
-          alertCount={regulationAlerts.filter((a) => a.status === "new").length}
+          workspaceMode={workspaceMode}
+          hasUnsavedChanges={hasUnsavedChanges}
+          lastUpdated="2026-01-10 14:30"
+          onWorkspaceModeChange={handleWorkspaceModeChange}
+          onCancelChanges={handleCancelChanges}
+          onSaveChanges={handleSaveChanges}
         />
 
         <main className="flex-1 overflow-hidden">
@@ -55,37 +81,34 @@ export default function Home() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
-                className="flex h-full"
+                className="flex h-full flex-col"
               >
-                {/* Left: Scoring with Evidence */}
-                <ScoringPanel
-                  pillar={selectedPillar}
-                  onEvidenceClick={handleEvidenceClick}
-                  activeParagraphId={activeParagraphId}
-                />
+                <div className="flex-1 overflow-hidden">
+                  {workspaceMode === "view" ? (
+                    <div className="flex h-full">
+                      {/* Left: Scoring with Evidence */}
+                      <WorkspacePillarsPanel
+                        countryData={indonesiaData}
+                        onEvidenceClick={handleEvidenceClick}
+                        activeParagraphId={activeParagraphId}
+                      />
 
-                {/* Right: Consolidated Measure as reference */}
-                <DocumentViewer
-                  measure={consolidatedMeasure}
-                  activeParagraphId={activeParagraphId}
-                  onParagraphClear={() => setActiveParagraphId(null)}
-                />
-              </motion.div>
-            )}
-
-            {activeView === "editor" && (
-              <motion.div
-                key="editor"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="h-full"
-              >
-                <MeasureEditor
-                  measure={consolidatedMeasure}
-                  sourceDocuments={sourceDocuments}
-                />
+                      {/* Right: Consolidated Measure as reference */}
+                      <DocumentViewer
+                        measure={consolidatedMeasure}
+                        activeParagraphId={activeParagraphId}
+                        onParagraphClear={() => setActiveParagraphId(null)}
+                      />
+                    </div>
+                  ) : (
+                    <MeasureEditor
+                      key={editorSessionKey}
+                      measure={consolidatedMeasure}
+                      sourceDocuments={sourceDocuments}
+                      onDirtyChange={setHasUnsavedChanges}
+                    />
+                  )}
+                </div>
               </motion.div>
             )}
 
@@ -98,7 +121,7 @@ export default function Home() {
                 transition={{ duration: 0.3 }}
                 className="h-full overflow-auto p-6"
               >
-                <AlertsPanel alerts={regulationAlerts} />
+                <AlertsPanel workspaceName={selectedWorkspace} alerts={currentWorkspaceAlerts} />
               </motion.div>
             )}
           </AnimatePresence>
