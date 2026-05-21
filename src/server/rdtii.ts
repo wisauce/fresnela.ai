@@ -1,0 +1,98 @@
+import type { RdtiiIndicator } from "./types";
+
+export const rdtiiIndicators: RdtiiIndicator[] = [
+  {
+    id: "6.1",
+    pillarId: "pillar-6",
+    pillarNumber: 6,
+    name: "Ban and Local Processing Requirements",
+    weight: 38,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Restrictions requiring data processing inside the economy." },
+    evidenceHints: ["local processing", "within the territory", "data processing", "personal data"],
+  },
+  {
+    id: "6.2",
+    pillarId: "pillar-6",
+    pillarNumber: 6,
+    name: "Local Storage Requirements",
+    weight: 12,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Requirements to store or keep copies of data locally." },
+    evidenceHints: ["local storage", "data must be stored", "copy of data", "accessible within territory"],
+  },
+  {
+    id: "6.3",
+    pillarId: "pillar-6",
+    pillarNumber: 6,
+    name: "Infrastructure Requirements",
+    weight: 31,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Mandates for data centers, servers, or local infrastructure." },
+    evidenceHints: ["data center", "local server", "infrastructure", "disaster recovery center"],
+  },
+  {
+    id: "6.4",
+    pillarId: "pillar-6",
+    pillarNumber: 6,
+    name: "Conditional Flow Regimes",
+    weight: 12,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Conditions for cross-border data transfer." },
+    evidenceHints: ["cross-border transfer", "adequate protection", "binding corporate", "consent"],
+  },
+  {
+    id: "6.5",
+    pillarId: "pillar-6",
+    pillarNumber: 6,
+    name: "Not in Binding Commitments",
+    weight: 8,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Binding trade commitments on data flows." },
+    evidenceHints: ["electronic commerce", "trade agreement", "shall not prevent", "data flows"],
+  },
+  {
+    id: "7.1",
+    pillarId: "pillar-7",
+    pillarNumber: 7,
+    name: "Lack of Data Protection Framework",
+    weight: 31,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Presence or absence of data protection/privacy law." },
+    evidenceHints: ["personal data protection", "privacy law", "data controller", "data subject"],
+  },
+  {
+    id: "7.2",
+    pillarId: "pillar-7",
+    pillarNumber: 7,
+    name: "Lack of Cybersecurity Framework",
+    weight: 31,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Cybersecurity legal framework." },
+    evidenceHints: ["cybersecurity", "network security", "electronic system", "incident"],
+  },
+  {
+    id: "7.3",
+    pillarId: "pillar-7",
+    pillarNumber: 7,
+    name: "Minimum Data Retention Period",
+    weight: 16,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Mandatory minimum retention periods." },
+    evidenceHints: ["retain", "retention period", "minimum period", "transaction data"],
+  },
+  {
+    id: "7.4",
+    pillarId: "pillar-7",
+    pillarNumber: 7,
+    name: "DPO/DPIA Requirements",
+    weight: 6,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "DPO or data protection impact assessment obligations." },
+    evidenceHints: ["data protection officer", "impact assessment", "DPIA", "high risk"],
+  },
+  {
+    id: "7.5",
+    pillarId: "pillar-7",
+    pillarNumber: 7,
+    name: "Government Access to Personal Data",
+    weight: 16,
+    rubric: { scoreOptions: [0, 0.5, 1], focus: "Government access to personal/electronic data." },
+    evidenceHints: ["law enforcement", "government access", "provide access", "interception"],
+  },
+];
+
+export function indicatorsForPillars(pillars: string[]) {
+  return rdtiiIndicators.filter((indicator) => pillars.includes(indicator.pillarId));
+}

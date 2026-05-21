@@ -29,7 +29,7 @@ interface SidebarProps {
   isScoreLoading?: boolean;
 }
 
-const workspaceOptions = ["Indonesia", "Singapore", "Malaysia", "Thailand"];
+const workspaceOptions: string[] = [];
 
 export function Sidebar({
   collapsed,
@@ -44,12 +44,9 @@ export function Sidebar({
   isScoreLoading = false,
 }: SidebarProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  const [chatbotHintVisible, setChatbotHintVisible] = useState(false);
 
   const handleChatbotClick = () => {
-    // TODO: Replace this local placeholder with the future chatbot modal/page behavior.
-    setChatbotHintVisible(true);
-    window.setTimeout(() => setChatbotHintVisible(false), 1800);
+    window.location.href = "/workspaces";
   };
 
   return (
@@ -90,7 +87,7 @@ export function Sidebar({
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="absolute left-3 right-3 top-[58px] z-20 overflow-hidden rounded-xl border border-ink-700 bg-ink-900 shadow-xl"
             >
-            {workspaceOptions.map((workspace) => (
+            {[selectedWorkspace, ...workspaceOptions].map((workspace) => (
               <button
                 key={workspace}
                 type="button"
@@ -158,7 +155,7 @@ export function Sidebar({
           </button>
 
           <Link
-            href="/version-history"
+            href="/workspaces"
             className={`interactive-control flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
               activeView === "version-history"
                 ? "bg-primary-500/20 text-primary-300"
@@ -185,18 +182,6 @@ export function Sidebar({
           <MessageCircle className="h-4 w-4 shrink-0" />
           {!collapsed && <span>Ask AI</span>}
         </button>
-        <AnimatePresence>
-          {!collapsed && chatbotHintVisible && (
-            <motion.p
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 4 }}
-              className="mt-2 rounded-lg bg-ink-800 px-2 py-1 text-center text-[10px] text-ink-300"
-            >
-              Chatbot coming soon
-            </motion.p>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Overall Score */}

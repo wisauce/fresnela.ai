@@ -1,13 +1,18 @@
+import Link from "next/link";
 import { Bell } from "lucide-react";
-import { notificationItems } from "@/data/notifications";
+import { listAlerts } from "@/server/db";
 
-const statusStyles: Record<string, string> = {
-  "Amendment detected": "bg-primary-100 text-primary-700 border-primary-200",
-  "Review required": "bg-blue-100 text-blue-700 border-blue-200",
-  "Evidence updated": "bg-emerald-100 text-emerald-700 border-emerald-200",
+const severityStyles: Record<string, string> = {
+  High: "bg-red-50 text-red-700 border-red-200",
+  Medium: "bg-primary-100 text-primary-700 border-primary-200",
+  Low: "bg-emerald-50 text-emerald-700 border-emerald-200",
 };
 
+export const runtime = "nodejs";
+
 export default function NotificationsPage() {
+  const alerts = listAlerts();
+
   return (
     <main className="h-full overflow-y-auto bg-comfort px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
@@ -18,53 +23,28 @@ export default function NotificationsPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-ink-900">Notifications</h1>
-              <p className="mt-1 text-sm text-ink-500">
-                Track RDTII scoring reviews, evidence updates, and amendment checks across regulatory workspaces.
-              </p>
+              <p className="mt-1 text-sm text-ink-500">Real alerts created by source ingestion, OCR, mapping, and review workflows.</p>
             </div>
           </div>
         </section>
 
-        {notificationItems.length > 0 ? (
+        {alerts.length > 0 ? (
           <section className="space-y-3">
-            {notificationItems.map((item) => (
-              <article
-                key={item.id}
-                className="interactive-surface rounded-xl border border-surface-200 bg-comfort p-4 shadow-sm"
-              >
+            {alerts.map((item) => (
+              <article key={item.id} className="interactive-surface rounded-xl border border-surface-200 bg-comfort p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <h2 className="truncate text-base font-semibold text-ink-900">{item.title}</h2>
-                    <span className="rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-700">
-                      {item.relatedPillar}
-                    </span>
+                  <div>
+                    <h2 className="text-base font-semibold text-ink-900">{item.title}</h2>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-600">{item.message}</p>
                   </div>
-                  <span
-                    className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                      statusStyles[item.status] || "border-surface-200 bg-surface-100 text-ink-600"
-                    }`}
-                  >
-                    {item.status}
+                  <span className={`shrink-0 rounded-full border px-2.5 py-1 text-xs font-medium ${severityStyles[item.severity] || "border-surface-200 bg-surface-100 text-ink-600"}`}>
+                    {item.severity}
                   </span>
                 </div>
-
-                <p className="mt-2 text-sm leading-relaxed text-ink-600">{item.description}</p>
-
                 <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
-                  <span>
-                    <span className="font-semibold text-ink-700">Workspace:</span> {item.workspaceName}
-                  </span>
-                  <span>
-                    <span className="font-semibold text-ink-700">Related Pillar:</span> {item.relatedPillar}
-                  </span>
-                  <span>
-                    <span className="font-semibold text-ink-700">Timestamp:</span> {item.timestamp}
-                  </span>
-                </div>
-
-                <div className="mt-4 border-t border-surface-200 bg-comfort-hover px-3 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-ink-500">To Do</p>
-                  <p className="mt-1 text-sm leading-relaxed text-ink-800">{item.toDo}</p>
+                  <span><span className="font-semibold text-ink-700">Status:</span> {item.status}</span>
+                  <span><span className="font-semibold text-ink-700">Created:</span> {new Date(item.createdAt).toLocaleString()}</span>
+                  <Link href={`/workspaces/${item.workspaceId}`} className="font-semibold text-primary-700 hover:text-primary-800">Open workspace</Link>
                 </div>
               </article>
             ))}
@@ -73,9 +53,7 @@ export default function NotificationsPage() {
           <section className="rounded-xl border border-dashed border-surface-300 bg-comfort px-6 py-12 text-center">
             <Bell className="mx-auto h-8 w-8 text-ink-300" />
             <h2 className="mt-3 text-sm font-semibold text-ink-800">No notifications yet</h2>
-            <p className="mt-1 text-sm text-ink-500">
-              Document amendments and review tasks will appear here when available.
-            </p>
+            <p className="mt-1 text-sm text-ink-500">Alerts will appear here only when real workspace actions create them.</p>
           </section>
         )}
       </div>

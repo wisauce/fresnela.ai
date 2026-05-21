@@ -1,23 +1,42 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bell, Settings } from "lucide-react";
-import { notificationItems } from "@/data/notifications";
+import { Bell } from "lucide-react";
 
 const statusStyles: Record<string, string> = {
-  "Amendment detected": "bg-primary-100 text-primary-700 border-primary-200",
-  "Review required": "bg-blue-100 text-blue-700 border-blue-200",
-  "Evidence updated": "bg-emerald-100 text-emerald-700 border-emerald-200",
+  High: "bg-red-50 text-red-700 border-red-200",
+  Medium: "bg-primary-100 text-primary-700 border-primary-200",
+  Low: "bg-emerald-50 text-emerald-700 border-emerald-200",
+};
+
+type AlertItem = {
+  id: string;
+  workspaceId: string;
+  title: string;
+  message: string;
+  severity: string;
+  status: string;
+  createdAt: string;
 };
 
 export function GlobalNavbar() {
-  const alertCount = notificationItems.length;
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const openAlerts = alerts.filter((alert) => alert.status !== "resolved");
+  const alertCount = openAlerts.length;
+
+  useEffect(() => {
+    void fetch("/api/alerts", { cache: "no-store" })
+      .then((res) => res.ok ? res.json() : { alerts: [] })
+      .then((json) => setAlerts(json.alerts ?? []))
+      .catch(() => setAlerts([]));
+  }, []);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-14 border-b border-surface-200 bg-comfort text-ink-900 shadow-sm">
       <div className="flex h-full items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex min-w-0 items-center gap-3 rounded-lg transition-opacity hover:bg-comfort-hover hover:opacity-95 focus:outline-none focus-visible:bg-comfort-hover">
+        <Link href="/workspaces" className="flex min-w-0 items-center gap-3 rounded-lg transition-opacity hover:bg-comfort-hover hover:opacity-95 focus:outline-none focus-visible:bg-comfort-hover">
           <Image
             src="/Logo.svg"
             alt="RDTII Evidence Workspace"
@@ -34,10 +53,10 @@ export function GlobalNavbar() {
 
         <div className="flex items-center gap-2">
           <Link
-            href="/manage-workspace"
+            href="/workspaces"
             className="interactive-control rounded-lg px-3 py-2 text-sm font-medium text-[#444444] transition-colors hover:bg-comfort-hover hover:text-ink-900 focus:outline-none focus-visible:bg-comfort-hover focus-visible:text-ink-900"
           >
-            Manage Workspace
+            Workspaces
           </Link>
 
           <div className="group relative">
@@ -56,9 +75,9 @@ export function GlobalNavbar() {
 
             <div className="invisible absolute right-0 top-full w-80 pt-3 opacity-0 transition-all duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
               <div className="flex max-h-[28rem] flex-col overflow-hidden rounded-xl border border-surface-200 bg-comfort text-ink-800 shadow-xl shadow-ink-900/15">
-                {notificationItems.length > 0 ? (
+                {openAlerts.length > 0 ? (
                   <div className="overflow-y-auto py-1">
-                    {notificationItems.map((item) => (
+                    {openAlerts.slice(0, 6).map((item) => (
                       <Link
                         key={item.id}
                         href="/notifications"
@@ -66,15 +85,15 @@ export function GlobalNavbar() {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <p className="min-w-0 flex-1 truncate text-xs font-semibold text-ink-800">{item.title}</p>
-                          <span className="shrink-0 text-[10px] text-ink-400">{item.time}</span>
+                          <span className="shrink-0 text-[10px] text-ink-400">{new Date(item.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <p className="mt-0.5 truncate text-[10px] font-medium text-primary-700">{item.workspaceName}</p>
+                        <p className="mt-0.5 truncate text-[10px] font-medium text-primary-700">{item.message}</p>
                         <div className="mt-1 flex items-center gap-1.5">
-                          <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyles[item.status] || "border-surface-200 bg-surface-100 text-ink-600"}`}>
-                            {item.status}
+                          <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${statusStyles[item.severity] || "border-surface-200 bg-surface-100 text-ink-600"}`}>
+                            {item.severity}
                           </span>
                           <span className="rounded-full bg-surface-100 px-2 py-0.5 text-[10px] font-medium text-ink-500">
-                            {item.relatedPillar}
+                            {item.status}
                           </span>
                         </div>
                       </Link>
@@ -97,15 +116,6 @@ export function GlobalNavbar() {
               </div>
             </div>
           </div>
-
-          {/* TODO: Wire this to future full-page settings overlay with language settings. */}
-          <button
-            type="button"
-            aria-label="Settings"
-            className="interactive-control rounded-lg p-2 text-[#444444] transition-colors hover:bg-comfort-hover hover:text-ink-900 focus:outline-none focus-visible:bg-comfort-hover focus-visible:text-ink-900"
-          >
-            <Settings className="h-5 w-5" />
-          </button>
         </div>
       </div>
     </header>

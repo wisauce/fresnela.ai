@@ -1,48 +1,5 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Sidebar } from "@/components/Sidebar";
-import { TopBar } from "@/components/TopBar";
-import { AlertsPanel } from "@/components/AlertsPanel";
-import { indonesiaData } from "@/data/dummy";
-import { workspaceAlerts } from "@/data/workspaceAlerts";
-
-export default function WorkspaceAlertsPage() {
-  const router = useRouter();
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState("Indonesia");
-
-  const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
-
-  return (
-    <div className="flex h-full overflow-hidden">
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-        activeView="alerts"
-        onViewChange={() => router.push("/")}
-        countryData={indonesiaData}
-        selectedWorkspace={selectedWorkspace}
-        onWorkspaceChange={setSelectedWorkspace}
-        alertCount={currentWorkspaceAlerts.length}
-        onAlertsClick={() => undefined}
-      />
-
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <TopBar
-          workspaceMode="view"
-          hasUnsavedChanges={false}
-          lastUpdated="2026-01-10 14:30"
-          onWorkspaceModeChange={() => router.push("/")}
-          onCancelChanges={() => undefined}
-          onSaveChanges={() => undefined}
-        />
-
-        <main className="flex-1 overflow-y-auto bg-surface-50 p-6">
-          <AlertsPanel workspaceName={selectedWorkspace} alerts={currentWorkspaceAlerts} />
-        </main>
-      </div>
-    </div>
-  );
+export default function AlertsRedirectPage() {
+  redirect("/notifications");
 }
