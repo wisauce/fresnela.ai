@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Play, CheckCircle2, Pencil } from "lucide-react";
 import { Sidebar } from "@/components/Sidebar";
@@ -10,9 +11,8 @@ import { MeasureEditor } from "@/components/MeasureEditor";
 import { AlertsPanel } from "@/components/AlertsPanel";
 import { TopBar } from "@/components/TopBar";
 import {
-  indonesiaData,
-  consolidatedMeasure,
-  sourceDocuments,
+  defaultWorkspaceName,
+  getWorkspaceData,
 } from "@/data/dummy";
 import { workspaceAlerts } from "@/data/workspaceAlerts";
 
@@ -21,16 +21,33 @@ export default function Home() {
   const [workspaceMode, setWorkspaceMode] = useState<"view" | "edit">("view");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [editorSessionKey, setEditorSessionKey] = useState(0);
-  const [selectedWorkspace, setSelectedWorkspace] = useState("Indonesia");
+  const [selectedWorkspace, setSelectedWorkspace] = useState(defaultWorkspaceName);
+  const searchParams = useSearchParams();
   const [activeParagraphId, setActiveParagraphId] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isScoringRunning, setIsScoringRunning] = useState(false);
   const [scoringMessage, setScoringMessage] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState("2026-01-10 14:30");
+  const workspaceData = getWorkspaceData(selectedWorkspace);
+  const [lastUpdated, setLastUpdated] = useState(workspaceData.lastUpdated);
   const [modeTransitionStatus, setModeTransitionStatus] = useState<"entering-edit" | null>(null);
   const [saveStatus, setSaveStatus] = useState<"saving" | "saved" | null>(null);
 
   const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
+
+  useEffect(() => {
+    setLastUpdated(workspaceData.lastUpdated);
+    setActiveParagraphId(null);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("lastWorkspace", selectedWorkspace);
+    }
+  }, [selectedWorkspace, workspaceData.lastUpdated]);
+
+  useEffect(() => {
+    const workspaceParam = searchParams.get("workspace");
+    if (workspaceParam) {
+      setSelectedWorkspace(workspaceParam);
+    }
+  }, [searchParams]);
 
   const handleEvidenceClick = (paragraphId: string) => {
     setActiveParagraphId((current) => current === paragraphId ? null : paragraphId);
@@ -93,7 +110,7 @@ export default function Home() {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         activeView={activeView}
         onViewChange={setActiveView}
-        countryData={indonesiaData}
+        countryData={workspaceData.countryData}
         selectedWorkspace={selectedWorkspace}
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={currentWorkspaceAlerts.length}
@@ -109,6 +126,7 @@ export default function Home() {
           lastUpdated={lastUpdated}
           modeTransitionStatus={modeTransitionStatus}
           saveStatus={saveStatus}
+          showWorkspaceControls={activeView === "workspace"}
           onWorkspaceModeChange={handleWorkspaceModeChange}
           onCancelChanges={handleCancelChanges}
           onSaveChanges={handleSaveChanges}
@@ -176,7 +194,7 @@ export default function Home() {
                     <div className="flex h-full">
                       {/* Left: Scoring with Evidence */}
                       <WorkspacePillarsPanel
-                        countryData={indonesiaData}
+                        countryData={workspaceData.countryData}
                         onEvidenceClick={handleEvidenceClick}
                         activeParagraphId={activeParagraphId}
                         isScoringLoading={isScoringRunning}
@@ -184,7 +202,7 @@ export default function Home() {
 
                       {/* Right: Consolidated Measure as reference */}
                       <DocumentViewer
-                        measure={consolidatedMeasure}
+                        measure={workspaceData.measure}
                         activeParagraphId={activeParagraphId}
                         onParagraphClear={() => setActiveParagraphId(null)}
                       />
@@ -192,8 +210,8 @@ export default function Home() {
                   ) : (
                     <MeasureEditor
                       key={editorSessionKey}
-                      measure={consolidatedMeasure}
-                      sourceDocuments={sourceDocuments}
+                      measure={workspaceData.measure}
+                      sourceDocuments={workspaceData.sourceDocuments}
                       onDirtyChange={setHasUnsavedChanges}
                     />
                   )}

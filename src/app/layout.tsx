@@ -5,6 +5,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "RDTII Regulatory Evidence Workspace",
   description: "AI-powered regulatory analysis tool for the Regional Digital Trade Integration Index",
+  icons: {
+    icon: "/fresnela.svg"
+  },
 };
 
 export default function RootLayout({

@@ -12,9 +12,9 @@ import {
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
-  MessageCircle,
 } from "lucide-react";
 import type { CountryData } from "@/data/dummy";
+import { countryOptions } from "@/data/workspaces";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -29,8 +29,6 @@ interface SidebarProps {
   isScoreLoading?: boolean;
 }
 
-const workspaceOptions = ["Indonesia", "Singapore", "Malaysia", "Thailand"];
-
 export function Sidebar({
   collapsed,
   onToggle,
@@ -44,13 +42,6 @@ export function Sidebar({
   isScoreLoading = false,
 }: SidebarProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  const [chatbotHintVisible, setChatbotHintVisible] = useState(false);
-
-  const handleChatbotClick = () => {
-    // TODO: Replace this local placeholder with the future chatbot modal/page behavior.
-    setChatbotHintVisible(true);
-    window.setTimeout(() => setChatbotHintVisible(false), 1800);
-  };
 
   return (
     <motion.aside
@@ -67,7 +58,7 @@ export function Sidebar({
             collapsed ? "justify-center hover:bg-ink-800" : "hover:bg-ink-800"
           }`}
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary-400 to-primary-600">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-surface-700">
             <BriefcaseBusiness className="h-4 w-4 text-white" />
           </div>
           {!collapsed && (
@@ -90,7 +81,7 @@ export function Sidebar({
               transition={{ duration: 0.18, ease: "easeOut" }}
               className="absolute left-3 right-3 top-[58px] z-20 overflow-hidden rounded-xl border border-ink-700 bg-ink-900 shadow-xl"
             >
-            {workspaceOptions.map((workspace) => (
+            {countryOptions.map((workspace) => (
               <button
                 key={workspace}
                 type="button"
@@ -173,32 +164,6 @@ export function Sidebar({
 
       <div className="flex-1" />
 
-      <div className="px-4 pb-3">
-        <button
-          type="button"
-          onClick={handleChatbotClick}
-          className={`interactive-control flex w-full items-center justify-center gap-2 rounded-xl border border-primary-500/30 bg-ink-800 px-3 py-2 text-sm font-semibold text-primary-300 transition-colors hover:bg-ink-700 hover:text-primary-200 ${
-            collapsed ? "px-0" : ""
-          }`}
-          aria-label="Open Chatbot"
-        >
-          <MessageCircle className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Ask AI</span>}
-        </button>
-        <AnimatePresence>
-          {!collapsed && chatbotHintVisible && (
-            <motion.p
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 4 }}
-              className="mt-2 rounded-lg bg-ink-800 px-2 py-1 text-center text-[10px] text-ink-300"
-            >
-              Chatbot coming soon
-            </motion.p>
-          )}
-        </AnimatePresence>
-      </div>
-
       {/* Overall Score */}
       <div className="border-t border-ink-700/50 p-4">
         {!collapsed ? (
@@ -206,23 +171,23 @@ export function Sidebar({
             <p className="text-[10px] text-primary-800 uppercase tracking-wider mb-1">Overall RDTII Score</p>
             {isScoreLoading ? (
               <div className="space-y-2">
-                <div className="h-8 w-20 animate-pulse rounded bg-primary-200" />
-                <div className="h-1.5 overflow-hidden rounded-full bg-primary-200">
+                <div className="h-8 w-24 animate-pulse rounded bg-white/80" />
+                  <div className="h-1.5 overflow-hidden rounded-full bg-[#806C3B]">
                   <motion.div
                     initial={{ x: "-100%" }}
                     animate={{ x: "100%" }}
                     transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
-                    className="h-full w-1/2 rounded-full bg-ink-900/70"
+                      className="h-full w-1/2 rounded-full bg-ink-900/80"
                   />
                 </div>
               </div>
             ) : (
               <>
                 <div className="flex items-end gap-2">
-                  <span className="text-2xl font-bold text-ink-900">{countryData.overallScore.toFixed(2)}</span>
-                  <span className="text-xs text-primary-800 mb-1">/ 1.00</span>
+                  <span className="text-3xl font-semibold leading-none text-black">{countryData.overallScore.toFixed(2)}</span>
+                  <span className="text-xs font-medium text-primary-800 mb-1">/ 1.00</span>
                 </div>
-                <div className="mt-2 h-1.5 bg-primary-200 rounded-full overflow-hidden">
+                <div className="mt-3 h-1.5 bg-[#806C3B] rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${countryData.overallScore * 100}%` }}
@@ -235,8 +200,8 @@ export function Sidebar({
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary-700/20 bg-primary-500 text-[11px] font-bold text-ink-900">
-              {isScoreLoading ? <span className="h-3 w-6 animate-pulse rounded bg-primary-200" /> : countryData.overallScore.toFixed(2)}
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary-700/20 bg-primary-500 text-xs font-extrabold text-black">
+              {isScoreLoading ? <span className="h-3 w-7 animate-pulse rounded bg-white/80" /> : countryData.overallScore.toFixed(2)}
             </div>
           </div>
         )}

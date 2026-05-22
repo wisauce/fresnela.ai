@@ -27,7 +27,6 @@ function AlertCard({ alert, index }: { alert: WorkspaceAlert; index: number }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-2.5">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-primary-600" />
           <h2 className="truncate text-sm font-semibold text-ink-900">{alert.title}</h2>
         </div>
         <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${severityClass(alert.severity)}`}>
@@ -35,13 +34,13 @@ function AlertCard({ alert, index }: { alert: WorkspaceAlert; index: number }) {
         </span>
       </div>
 
-      <div className="mt-1.5 flex flex-wrap items-center gap-2 pl-6 text-xs text-ink-500">
+      <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-ink-500">
         <span className="font-medium text-ink-600">{relatedLabel}</span>
         <span className="text-ink-300">·</span>
         <span>{alert.timestamp}</span>
       </div>
 
-      <div className="mt-2 pl-6">
+      <div className="mt-2">
         <p className="text-sm leading-relaxed text-ink-700">{alert.message}</p>
         {alert.relatedPillar && alert.relatedSubpillar && (
           <div className="mt-2 flex flex-wrap gap-1.5">
@@ -63,7 +62,6 @@ export function AlertsPanel({ workspaceName, alerts }: AlertsPanelProps) {
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
         <div className="mb-2 flex items-center gap-3">
-          <FileWarning className="h-6 w-6 text-primary-600" />
           <h1 className="text-xl font-bold text-ink-800">{workspaceName} Workspace Alerts</h1>
         </div>
         <p className="text-sm text-ink-500">Warnings and review items that require attention in this workspace.</p>

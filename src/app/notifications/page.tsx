@@ -1,4 +1,7 @@
-import { Bell } from "lucide-react";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Bell } from "lucide-react";
 import { notificationItems } from "@/data/notifications";
 
 const statusStyles: Record<string, string> = {
@@ -8,11 +11,26 @@ const statusStyles: Record<string, string> = {
 };
 
 export default function NotificationsPage() {
+  const router = useRouter();
+
+  const handleBackToWorkspace = () => {
+    const lastWorkspace = typeof window !== "undefined"
+      ? window.localStorage.getItem("lastWorkspace")
+      : null;
+
+    if (lastWorkspace) {
+      router.push(`/?workspace=${encodeURIComponent(lastWorkspace)}`);
+      return;
+    }
+
+    router.push("/");
+  };
+
   return (
     <main className="h-full overflow-y-auto bg-comfort px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl space-y-6">
         <section className="border-b border-surface-200 pb-5">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
               <Bell className="h-5 w-5" />
             </div>
@@ -23,6 +41,14 @@ export default function NotificationsPage() {
               </p>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={handleBackToWorkspace}
+            className="interactive-control mt-4 inline-flex items-center gap-2 rounded-lg border border-surface-200 px-4 py-2 text-sm font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus-visible:bg-primary-50"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Go back to workspace
+          </button>
         </section>
 
         {notificationItems.length > 0 ? (
@@ -35,7 +61,7 @@ export default function NotificationsPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <h2 className="truncate text-base font-semibold text-ink-900">{item.title}</h2>
-                    <span className="rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-700">
+                    <span className="rounded-full border border-primary-200 bg-primary-50 px-2.5 py-0.5 text-[11px] font-semibold text-primary-700">
                       {item.relatedPillar}
                     </span>
                   </div>

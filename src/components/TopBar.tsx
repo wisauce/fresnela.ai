@@ -15,6 +15,7 @@ interface TopBarProps {
   lastUpdated: string;
   modeTransitionStatus?: "entering-edit" | null;
   saveStatus?: "saving" | "saved" | null;
+  showWorkspaceControls?: boolean;
   onWorkspaceModeChange: (mode: "view" | "edit") => void;
   onCancelChanges: () => void;
   onSaveChanges: () => void;
@@ -26,6 +27,7 @@ export function TopBar({
   lastUpdated,
   modeTransitionStatus = null,
   saveStatus = null,
+  showWorkspaceControls = true,
   onWorkspaceModeChange,
   onCancelChanges,
   onSaveChanges,
@@ -46,7 +48,7 @@ export function TopBar({
       <div className="flex shrink-0 items-end gap-2">
         <span className="hidden pb-1.5 text-xs text-ink-500 md:inline">Last updated: {lastUpdated}</span>
 
-        {hasUnsavedChanges && (
+        {showWorkspaceControls && hasUnsavedChanges && (
           <div className="flex items-center gap-1 border-r border-surface-200 pr-2">
             <button
               type="button"
@@ -69,41 +71,43 @@ export function TopBar({
           </div>
         )}
 
-        {saveStatus === "saved" && (
+        {showWorkspaceControls && saveStatus === "saved" && (
           <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
             <Check className="h-3.5 w-3.5" />
             Changes saved
           </span>
         )}
 
-        <div className="flex rounded-lg border border-surface-200 bg-surface-50 p-1">
-          <button
-            type="button"
-            aria-label="View Mode"
-            onClick={() => onWorkspaceModeChange("view")}
-            disabled={modeTransitionStatus === "entering-edit"}
-            className={`interactive-control rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-              workspaceMode === "view"
-                ? "bg-primary-100 text-primary-700"
-                : "text-ink-500 hover:bg-comfort-hover hover:text-ink-800"
-            }`}
-          >
-            <Eye className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            aria-label="Edit Mode"
-            onClick={() => onWorkspaceModeChange("edit")}
-            disabled={modeTransitionStatus === "entering-edit"}
-            className={`interactive-control rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-              workspaceMode === "edit"
-                ? "bg-primary-100 text-primary-700"
-                : "text-ink-500 hover:bg-comfort-hover hover:text-ink-800"
-            }`}
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-        </div>
+        {showWorkspaceControls && (
+          <div className="flex rounded-lg border border-surface-200 bg-surface-50 p-1">
+            <button
+              type="button"
+              aria-label="View Mode"
+              onClick={() => onWorkspaceModeChange("view")}
+              disabled={modeTransitionStatus === "entering-edit"}
+              className={`interactive-control rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                workspaceMode === "view"
+                  ? "bg-primary-100 text-primary-700"
+                  : "text-ink-500 hover:bg-comfort-hover hover:text-ink-800"
+              }`}
+            >
+              <Eye className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-label="Edit Mode"
+              onClick={() => onWorkspaceModeChange("edit")}
+              disabled={modeTransitionStatus === "entering-edit"}
+              className={`interactive-control rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                workspaceMode === "edit"
+                  ? "bg-primary-100 text-primary-700"
+                  : "text-ink-500 hover:bg-comfort-hover hover:text-ink-800"
+              }`}
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          </div>
+        )}
 
       </div>
     </header>

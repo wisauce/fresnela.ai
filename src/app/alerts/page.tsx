@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/Sidebar";
 import { TopBar } from "@/components/TopBar";
 import { AlertsPanel } from "@/components/AlertsPanel";
-import { indonesiaData } from "@/data/dummy";
+import { defaultWorkspaceName, getWorkspaceData } from "@/data/dummy";
 import { workspaceAlerts } from "@/data/workspaceAlerts";
 
 export default function WorkspaceAlertsPage() {
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [selectedWorkspace, setSelectedWorkspace] = useState("Indonesia");
+  const [selectedWorkspace, setSelectedWorkspace] = useState(defaultWorkspaceName);
+  const workspaceData = getWorkspaceData(selectedWorkspace);
 
   const currentWorkspaceAlerts = workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace);
 
@@ -22,7 +23,7 @@ export default function WorkspaceAlertsPage() {
         onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
         activeView="alerts"
         onViewChange={() => router.push("/")}
-        countryData={indonesiaData}
+        countryData={workspaceData.countryData}
         selectedWorkspace={selectedWorkspace}
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={currentWorkspaceAlerts.length}
@@ -34,6 +35,7 @@ export default function WorkspaceAlertsPage() {
           workspaceMode="view"
           hasUnsavedChanges={false}
           lastUpdated="2026-01-10 14:30"
+          showWorkspaceControls={false}
           onWorkspaceModeChange={() => router.push("/")}
           onCancelChanges={() => undefined}
           onSaveChanges={() => undefined}

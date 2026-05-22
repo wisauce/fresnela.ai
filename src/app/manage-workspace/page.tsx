@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
+  ExternalLink,
   FileText,
   Grid2X2,
   List,
@@ -42,40 +44,55 @@ function StatusBadge({ status }: { status: WorkspaceItem["status"] }) {
 }
 
 function PillarPill({ pillar }: { pillar: string }) {
-  const className = pillar === "Pillar 6"
-    ? "border-[#FF2076] bg-[#FBE6F4] text-[#700B49]"
-    : pillar === "Pillar 7"
-      ? "border-[#FF66C4] bg-[#FBE6F4] text-[#700B49]"
-      : "border-surface-200 bg-surface-100 text-ink-600";
+  const className = pillar === "Pillar 6" || pillar === "Pillar 7"
+    ? "border-primary-200 bg-primary-50 text-primary-700"
+    : "border-surface-200 bg-surface-100 text-ink-600";
 
   return (
-    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold ${className}`}>
+    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold ${className}`}>
       {pillar}
     </span>
   );
 }
 
-function AttentionBadge({ count }: { count: number }) {
+function AttentionBadge({ count, showLabel = false }: { count: number; showLabel?: boolean }) {
   if (count === 0) return null;
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-primary-200 bg-primary-50 px-2 py-0.5 text-[11px] font-semibold text-primary-700">
-      <AlertTriangle className="h-3 w-3 text-primary-700" />
-      <span>{count}</span>
-      <span>Need review</span>
+    <span className="inline-flex items-center gap-1 text-red-700" aria-label="Needs review">
+      <AlertTriangle className="h-3.5 w-3.5 text-red-700" />
+      {showLabel && <span className="text-[11px] font-semibold text-red-700">Need review</span>}
     </span>
   );
 }
 
-function OpenWorkspaceButton() {
+function ReviewStatusRow({ attentionCount, status, showLabel = false, align = "start" }: { attentionCount: number; status: WorkspaceItem["status"]; showLabel?: boolean; align?: "start" | "center" | "end" }) {
+  if (attentionCount === 0) {
+    return (
+      <div className={`flex items-center justify-${align}`}>
+        <StatusBadge status={status} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full items-center justify-between gap-2">
+      <AttentionBadge count={attentionCount} showLabel={showLabel} />
+      <StatusBadge status={status} />
+    </div>
+  );
+}
+
+function OpenWorkspaceButton({ workspaceName }: { workspaceName: string }) {
   return (
     // TODO: Navigate to a workspace detail route when that frontend route exists.
-    <button
-      type="button"
-      className="interactive-control rounded-lg border border-surface-200 px-3 py-1.5 text-xs font-semibold text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus-visible:bg-primary-50"
+    <Link
+      href={`/?workspace=${encodeURIComponent(workspaceName)}`}
+      aria-label="Open workspace"
+      className="interactive-control inline-flex h-8 w-8 items-center justify-center rounded-lg border border-surface-200 text-ink-600 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 focus:outline-none focus-visible:bg-primary-50"
     >
-      Open Workspace
-    </button>
+      <ExternalLink className="h-4 w-4" />
+    </Link>
   );
 }
 
@@ -107,18 +124,17 @@ function WorkspaceCard({ workspace, attentionCount }: { workspace: WorkspaceItem
         </div>
       </div>
 
-      <div className="mt-auto flex items-end justify-between gap-3 border-t border-surface-100 pt-3">
-        <div className="min-w-0 space-y-1 text-xs text-ink-500">
-          <div className="flex items-center gap-1.5 truncate">
-            <FileText className="h-3.5 w-3.5 shrink-0 text-ink-400" />
-            <span>{workspace.documentCount} documents</span>
+      <div className="mt-auto space-y-3 border-t border-surface-100 pt-3">
+        <ReviewStatusRow attentionCount={attentionCount} status={workspace.status} showLabel />
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0 space-y-1 text-xs text-ink-500">
+            <div className="flex items-center gap-1.5 truncate">
+              <FileText className="h-3.5 w-3.5 shrink-0 text-ink-400" />
+              <span>{workspace.documentCount}</span>
+            </div>
+            <p className="truncate">Updated {workspace.lastUpdated}</p>
           </div>
-          <p className="truncate">Updated {workspace.lastUpdated}</p>
-        </div>
-        <div className="flex shrink-0 flex-col items-end gap-2">
-          <StatusBadge status={workspace.status} />
-          <AttentionBadge count={attentionCount} />
-          <OpenWorkspaceButton />
+          <OpenWorkspaceButton workspaceName={workspace.countryName} />
         </div>
       </div>
     </article>
@@ -146,16 +162,13 @@ function WorkspaceRow({ workspace, attentionCount }: { workspace: WorkspaceItem;
           ))}
         </div>
       </td>
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-2">
-          <StatusBadge status={workspace.status} />
-          <AttentionBadge count={attentionCount} />
-        </div>
+      <td className="px-4 py-3 text-center">
+        <ReviewStatusRow attentionCount={attentionCount} status={workspace.status} align="center" />
       </td>
-      <td className="whitespace-nowrap px-4 py-3 text-sm text-ink-600">{workspace.documentCount} documents</td>
-      <td className="whitespace-nowrap px-4 py-3 text-sm text-ink-500">{workspace.lastUpdated}</td>
-      <td className="whitespace-nowrap px-4 py-3 text-right">
-        <OpenWorkspaceButton />
+      <td className="whitespace-nowrap px-4 py-3 text-center text-sm text-ink-600">{workspace.documentCount}</td>
+      <td className="whitespace-nowrap px-4 py-3 text-center text-sm text-ink-500">{workspace.lastUpdated}</td>
+      <td className="whitespace-nowrap px-4 py-3 text-center">
+        <OpenWorkspaceButton workspaceName={workspace.countryName} />
       </td>
     </tr>
   );
@@ -244,10 +257,10 @@ export default function ManageWorkspacePage() {
                 <tr className="border-b border-surface-200 bg-surface-50 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-500">
                   <th className="px-4 py-3">Workspace</th>
                   <th className="px-4 py-3">Active Pillars</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Documents</th>
-                  <th className="px-4 py-3">Last Updated</th>
-                  <th className="px-4 py-3 text-right">Action</th>
+                  <th className="px-4 py-3 text-center">Status</th>
+                  <th className="px-4 py-3 text-center">Documents</th>
+                  <th className="px-4 py-3 text-center">Last Updated</th>
+                  <th className="px-4 py-3 text-center">Action</th>
                 </tr>
               </thead>
               <tbody>

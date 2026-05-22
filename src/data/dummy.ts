@@ -685,6 +685,228 @@ export const indonesiaData: CountryData = {
   ],
 };
 
+export interface WorkspaceDataBundle {
+  countryData: CountryData;
+  measure: ConsolidatedMeasure;
+  sourceDocuments: SourceDocument[];
+  lastUpdated: string;
+}
+
+interface PillarOverride {
+  weightedScore: number;
+  indicatorScores: Record<string, number>;
+}
+
+interface CountrySpec {
+  id: string;
+  name: string;
+  flag: string;
+  overallScore: number;
+  asiaPacificAvgDiff: number;
+  subregionalAvgDiff: number;
+  lastUpdated: string;
+  pillars: Record<number, PillarOverride>;
+}
+
+const countrySpecs: CountrySpec[] = [
+  {
+    id: "IDN",
+    name: "Indonesia",
+    flag: "🇮🇩",
+    overallScore: 0.57,
+    asiaPacificAvgDiff: 56,
+    subregionalAvgDiff: 40,
+    lastUpdated: "2026-01-10 14:30",
+    pillars: {
+      6: { weightedScore: 0.67, indicatorScores: { "6.1": 1.0, "6.2": 0.5, "6.3": 1.0, "6.4": 1.0, "6.5": 0.0 } },
+      7: { weightedScore: 0.53, indicatorScores: { "7.1": 0.0, "7.2": 0.5, "7.3": 1.0, "7.4": 1.0, "7.5": 1.0 } },
+    },
+  },
+  {
+    id: "SGP",
+    name: "Singapore",
+    flag: "🇸🇬",
+    overallScore: 0.62,
+    asiaPacificAvgDiff: 49,
+    subregionalAvgDiff: 28,
+    lastUpdated: "2026-01-09 16:05",
+    pillars: {
+      6: { weightedScore: 0.48, indicatorScores: { "6.1": 0.3, "6.2": 0.2, "6.3": 0.4, "6.4": 0.6, "6.5": 0.0 } },
+      7: { weightedScore: 0.72, indicatorScores: { "7.1": 0.0, "7.2": 0.4, "7.3": 0.6, "7.4": 0.8, "7.5": 0.7 } },
+    },
+  },
+  {
+    id: "MYS",
+    name: "Malaysia",
+    flag: "🇲🇾",
+    overallScore: 0.49,
+    asiaPacificAvgDiff: 63,
+    subregionalAvgDiff: 44,
+    lastUpdated: "2026-01-08 11:20",
+    pillars: {
+      6: { weightedScore: 0.58, indicatorScores: { "6.1": 0.7, "6.2": 0.4, "6.3": 0.6, "6.4": 0.8, "6.5": 0.0 } },
+      7: { weightedScore: 0.42, indicatorScores: { "7.1": 0.2, "7.2": 0.5, "7.3": 0.4, "7.4": 0.4, "7.5": 0.5 } },
+    },
+  },
+  {
+    id: "THA",
+    name: "Thailand",
+    flag: "🇹🇭",
+    overallScore: 0.55,
+    asiaPacificAvgDiff: 54,
+    subregionalAvgDiff: 36,
+    lastUpdated: "2026-01-07 09:30",
+    pillars: {
+      6: { weightedScore: 0.62, indicatorScores: { "6.1": 0.8, "6.2": 0.4, "6.3": 0.7, "6.4": 0.9, "6.5": 0.0 } },
+      7: { weightedScore: 0.46, indicatorScores: { "7.1": 0.1, "7.2": 0.5, "7.3": 0.6, "7.4": 0.6, "7.5": 0.4 } },
+    },
+  },
+  {
+    id: "VNM",
+    name: "Vietnam",
+    flag: "🇻🇳",
+    overallScore: 0.61,
+    asiaPacificAvgDiff: 48,
+    subregionalAvgDiff: 30,
+    lastUpdated: "2026-01-09 13:45",
+    pillars: {
+      6: { weightedScore: 0.74, indicatorScores: { "6.1": 0.9, "6.2": 0.7, "6.3": 0.9, "6.4": 0.8, "6.5": 0.0 } },
+      7: { weightedScore: 0.48, indicatorScores: { "7.1": 0.2, "7.2": 0.5, "7.3": 0.5, "7.4": 0.6, "7.5": 0.6 } },
+    },
+  },
+  {
+    id: "PHL",
+    name: "Philippines",
+    flag: "🇵🇭",
+    overallScore: 0.52,
+    asiaPacificAvgDiff: 58,
+    subregionalAvgDiff: 41,
+    lastUpdated: "2026-01-06 10:15",
+    pillars: {
+      6: { weightedScore: 0.45, indicatorScores: { "6.1": 0.4, "6.2": 0.3, "6.3": 0.5, "6.4": 0.6, "6.5": 0.0 } },
+      7: { weightedScore: 0.59, indicatorScores: { "7.1": 0.1, "7.2": 0.6, "7.3": 0.7, "7.4": 0.7, "7.5": 0.6 } },
+    },
+  },
+  {
+    id: "BRN",
+    name: "Brunei Darussalam",
+    flag: "🇧🇳",
+    overallScore: 0.46,
+    asiaPacificAvgDiff: 67,
+    subregionalAvgDiff: 50,
+    lastUpdated: "2026-01-05 08:40",
+    pillars: {
+      6: { weightedScore: 0.51, indicatorScores: { "6.1": 0.6, "6.2": 0.3, "6.3": 0.6, "6.4": 0.5, "6.5": 0.0 } },
+      7: { weightedScore: 0.39, indicatorScores: { "7.1": 0.3, "7.2": 0.4, "7.3": 0.4, "7.4": 0.3, "7.5": 0.4 } },
+    },
+  },
+  {
+    id: "KHM",
+    name: "Cambodia",
+    flag: "🇰🇭",
+    overallScore: 0.43,
+    asiaPacificAvgDiff: 70,
+    subregionalAvgDiff: 54,
+    lastUpdated: "2026-01-04 15:25",
+    pillars: {
+      6: { weightedScore: 0.47, indicatorScores: { "6.1": 0.5, "6.2": 0.3, "6.3": 0.5, "6.4": 0.5, "6.5": 0.0 } },
+      7: { weightedScore: 0.36, indicatorScores: { "7.1": 0.3, "7.2": 0.4, "7.3": 0.3, "7.4": 0.3, "7.5": 0.3 } },
+    },
+  },
+  {
+    id: "LAO",
+    name: "Laos",
+    flag: "🇱🇦",
+    overallScore: 0.41,
+    asiaPacificAvgDiff: 72,
+    subregionalAvgDiff: 56,
+    lastUpdated: "2026-01-03 12:05",
+    pillars: {
+      6: { weightedScore: 0.44, indicatorScores: { "6.1": 0.5, "6.2": 0.2, "6.3": 0.5, "6.4": 0.4, "6.5": 0.0 } },
+      7: { weightedScore: 0.33, indicatorScores: { "7.1": 0.3, "7.2": 0.3, "7.3": 0.3, "7.4": 0.2, "7.5": 0.3 } },
+    },
+  },
+  {
+    id: "MMR",
+    name: "Myanmar",
+    flag: "🇲🇲",
+    overallScore: 0.38,
+    asiaPacificAvgDiff: 75,
+    subregionalAvgDiff: 60,
+    lastUpdated: "2026-01-02 09:50",
+    pillars: {
+      6: { weightedScore: 0.42, indicatorScores: { "6.1": 0.5, "6.2": 0.2, "6.3": 0.4, "6.4": 0.4, "6.5": 0.0 } },
+      7: { weightedScore: 0.31, indicatorScores: { "7.1": 0.3, "7.2": 0.3, "7.3": 0.3, "7.4": 0.2, "7.5": 0.3 } },
+    },
+  },
+];
+
+const buildCountryData = (spec: CountrySpec): CountryData => {
+  const shouldDecorateEvidence = spec.name !== "Indonesia";
+
+  return {
+    ...indonesiaData,
+    id: spec.id,
+    name: spec.name,
+    flag: spec.flag,
+    overallScore: spec.overallScore,
+    asiaPacificAvgDiff: spec.asiaPacificAvgDiff,
+    subregionalAvgDiff: spec.subregionalAvgDiff,
+    pillars: indonesiaData.pillars.map((pillar) => {
+      const pillarOverride = spec.pillars[pillar.number];
+      return {
+        ...pillar,
+        weightedScore: pillarOverride?.weightedScore ?? pillar.weightedScore,
+        indicators: pillar.indicators.map((indicator) => {
+          const indicatorScore = pillarOverride?.indicatorScores?.[indicator.id];
+          const evidence = indicator.evidence.map((ev) => {
+            if (!shouldDecorateEvidence) return ev;
+            const updatedExcerpt = ev.excerpt.replace(/Indonesia/g, spec.name);
+            return {
+              ...ev,
+              documentTitle: `${spec.name} ${ev.documentTitle}`,
+              excerpt: `${updatedExcerpt} - ${spec.name} workspace`,
+            };
+          });
+
+          return {
+            ...indicator,
+            score: indicatorScore ?? indicator.score,
+            evidence,
+          };
+        }),
+      };
+    }),
+  };
+};
+
+const buildMeasure = (spec: CountrySpec): ConsolidatedMeasure => ({
+  ...consolidatedMeasure,
+  id: `${spec.id}-P6P7`,
+  country: spec.name,
+  countryFlag: spec.flag,
+  title: `${spec.name} — Cross-border Data & Domestic Data Protection`,
+  subtitle: `Consolidated regulatory measure for ${spec.name} covering Pillar 6 and Pillar 7`,
+  lastUpdated: spec.lastUpdated.split(" ")[0],
+});
+
+export const workspaceDataByCountry: Record<string, WorkspaceDataBundle> = Object.fromEntries(
+  countrySpecs.map((spec) => [
+    spec.name,
+    {
+      countryData: buildCountryData(spec),
+      measure: buildMeasure(spec),
+      sourceDocuments,
+      lastUpdated: spec.lastUpdated,
+    },
+  ])
+);
+
+export const defaultWorkspaceName = "Indonesia";
+
+export const getWorkspaceData = (workspaceName: string) =>
+  workspaceDataByCountry[workspaceName] || workspaceDataByCountry[defaultWorkspaceName];
+
 export const regulationAlerts: RegulationAlert[] = [
   {
     id: "alert-1", title: "GR No. 17/2025 on Child Protection in Electronic Systems",
