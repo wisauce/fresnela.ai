@@ -28,6 +28,7 @@ export default function WorkspaceAlertsPage() {
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={currentWorkspaceAlerts.length}
         onAlertsClick={() => undefined}
+        onDocumentsClick={() => router.push("/")}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">

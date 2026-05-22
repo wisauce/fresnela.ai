@@ -9,6 +9,7 @@ import {
   Check,
   ChevronDown,
   AlertTriangle,
+  FileText,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
@@ -20,12 +21,13 @@ interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   activeView: string;
-  onViewChange: (view: "workspace") => void;
+  onViewChange: (view: "workspace" | "documents") => void;
   countryData: CountryData;
   selectedWorkspace: string;
   onWorkspaceChange: (workspace: string) => void;
   alertCount: number;
   onAlertsClick: () => void;
+  onDocumentsClick: () => void;
   isScoreLoading?: boolean;
 }
 
@@ -39,6 +41,7 @@ export function Sidebar({
   onWorkspaceChange,
   alertCount,
   onAlertsClick,
+  onDocumentsClick,
   isScoreLoading = false,
 }: SidebarProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -120,6 +123,19 @@ export function Sidebar({
             <LayoutDashboard className="h-5 w-5 shrink-0" />
             {!collapsed && <span className="text-sm font-medium">Workspace</span>}
           </motion.button>
+
+          <button
+            type="button"
+            onClick={onDocumentsClick}
+            className={`interactive-control w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
+              activeView === "documents"
+                ? "bg-primary-500/20 text-primary-300"
+                : "text-ink-300 hover:bg-ink-800/90 hover:text-white"
+            }`}
+          >
+            <FileText className="h-5 w-5 shrink-0" />
+            {!collapsed && <span className="text-sm font-medium">Documents</span>}
+          </button>
 
           <button
             type="button"

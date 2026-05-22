@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, Play, CheckCircle2, Pencil } from "lucide-react";
@@ -9,6 +9,7 @@ import { WorkspacePillarsPanel } from "@/components/WorkspacePillarsPanel";
 import { DocumentViewer } from "@/components/DocumentViewer";
 import { MeasureEditor } from "@/components/MeasureEditor";
 import { AlertsPanel } from "@/components/AlertsPanel";
+import { DocumentManagement } from "@/components/DocumentManagement";
 import { TopBar } from "@/components/TopBar";
 import {
   defaultWorkspaceName,
@@ -17,7 +18,15 @@ import {
 import { workspaceAlerts } from "@/data/workspaceAlerts";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<"workspace" | "alerts">("workspace");
+  return (
+    <Suspense fallback={<div className="flex h-full items-center justify-center"><Loader2 className="h-5 w-5 animate-spin text-primary-700" /></div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  const [activeView, setActiveView] = useState<"workspace" | "alerts" | "documents">("workspace");
   const [workspaceMode, setWorkspaceMode] = useState<"view" | "edit">("view");
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [editorSessionKey, setEditorSessionKey] = useState(0);
@@ -115,6 +124,7 @@ export default function Home() {
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={currentWorkspaceAlerts.length}
         onAlertsClick={() => setActiveView("alerts")}
+        onDocumentsClick={() => setActiveView("documents")}
         isScoreLoading={isScoringRunning}
       />
 
@@ -229,6 +239,19 @@ export default function Home() {
                 className="h-full overflow-auto p-6"
               >
                 <AlertsPanel workspaceName={selectedWorkspace} alerts={currentWorkspaceAlerts} />
+              </motion.div>
+            )}
+
+            {activeView === "documents" && (
+              <motion.div
+                key="documents"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="h-full"
+              >
+                <DocumentManagement workspaceName={selectedWorkspace} />
               </motion.div>
             )}
           </AnimatePresence>

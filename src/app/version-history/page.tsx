@@ -36,6 +36,7 @@ export default function VersionHistoryPage() {
         onWorkspaceChange={setSelectedWorkspace}
         alertCount={workspaceAlerts.filter((alert) => alert.workspace === selectedWorkspace).length}
         onAlertsClick={() => router.push("/alerts")}
+        onDocumentsClick={() => router.push("/")}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden">
