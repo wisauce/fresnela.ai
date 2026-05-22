@@ -2,13 +2,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Link2, ExternalLink, Edit3, CheckCircle2, AlertTriangle, ChevronDown, Layers, Languages } from "lucide-react";
+import { FileText, Link2, ExternalLink, Edit3, CheckCircle2, AlertTriangle, ChevronDown, Layers, Languages, FolderOpen, ArrowLeft } from "lucide-react";
 import type { ConsolidatedMeasure, ConsolidatedParagraph, SourceDocument } from "@/data/dummy";
 
 interface MeasureEditorProps {
   measure: ConsolidatedMeasure;
   sourceDocuments: SourceDocument[];
   onDirtyChange?: (dirty: boolean) => void;
+  onOpenDocumentManagement?: () => void;
+  onBackToScoring?: () => void;
 }
 
 function SourceDocumentSelector({ documents, activeDocId, onSelect }: { documents: SourceDocument[]; activeDocId: string | null; onSelect: (doc: SourceDocument) => void }) {
@@ -132,7 +134,7 @@ function SourceDocumentViewer({ document, activeParagraph }: { document: SourceD
   );
 }
 
-export function MeasureEditor({ measure, sourceDocuments, onDirtyChange }: MeasureEditorProps) {
+export function MeasureEditor({ measure, sourceDocuments, onDirtyChange, onOpenDocumentManagement, onBackToScoring }: MeasureEditorProps) {
   const [activeParagraph, setActiveParagraph] = useState<ConsolidatedParagraph | null>(null);
   const [activeSourceDoc, setActiveSourceDoc] = useState<SourceDocument | null>(null);
 
@@ -147,7 +149,17 @@ export function MeasureEditor({ measure, sourceDocuments, onDirtyChange }: Measu
     <div className="flex h-full">
       <div className="w-[480px] flex flex-col overflow-hidden border-r border-surface-200 bg-comfort shrink-0">
         <div className="px-4 py-3 bg-comfort border-b border-surface-200 shrink-0">
-          <div className="flex items-center gap-2 mb-1"><Edit3 className="w-4 h-4 text-primary-600" /><h2 className="text-sm font-semibold text-ink-800">Consolidated Measure</h2></div>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <div className="flex items-center gap-2">
+              {onBackToScoring && (
+                <button type="button" onClick={onBackToScoring} className="interactive-control rounded-lg p-1 text-ink-500 hover:bg-comfort-hover hover:text-ink-800">
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+              )}
+              <Edit3 className="w-4 h-4 text-primary-600" />
+              <h2 className="text-sm font-semibold text-ink-800">Consolidated Measure</h2>
+            </div>
+          </div>
           <p className="text-[11px] text-ink-500 ml-6">Click a paragraph to view its source provision →</p>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-5">
@@ -164,7 +176,21 @@ export function MeasureEditor({ measure, sourceDocuments, onDirtyChange }: Measu
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="px-4 py-2.5 border-b border-surface-200 bg-comfort-hover/70 shrink-0">
-          <SourceDocumentSelector documents={sourceDocuments} activeDocId={activeSourceDoc?.id || null} onSelect={(doc) => { onDirtyChange?.(true); setActiveSourceDoc(doc); setActiveParagraph(null); }} />
+          <div className="flex items-center gap-2">
+            <div className="flex-1 min-w-0">
+              <SourceDocumentSelector documents={sourceDocuments} activeDocId={activeSourceDoc?.id || null} onSelect={(doc) => { onDirtyChange?.(true); setActiveSourceDoc(doc); setActiveParagraph(null); }} />
+            </div>
+            {onOpenDocumentManagement && (
+              <button
+                type="button"
+                onClick={onOpenDocumentManagement}
+                className="interactive-control shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-1.5 text-[11px] font-semibold text-primary-700 hover:bg-primary-100 transition-colors"
+              >
+                <FolderOpen className="h-3.5 w-3.5" />
+                Manage Sources
+              </button>
+            )}
+          </div>
         </div>
         <SourceDocumentViewer document={activeSourceDoc} activeParagraph={activeParagraph} />
       </div>

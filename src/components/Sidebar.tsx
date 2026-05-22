@@ -9,7 +9,6 @@ import {
   Check,
   ChevronDown,
   AlertTriangle,
-  FileText,
   LayoutDashboard,
   ChevronLeft,
   ChevronRight,
@@ -21,13 +20,12 @@ interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
   activeView: string;
-  onViewChange: (view: "workspace" | "documents") => void;
+  onViewChange: (view: "workspace") => void;
   countryData: CountryData;
   selectedWorkspace: string;
   onWorkspaceChange: (workspace: string) => void;
   alertCount: number;
   onAlertsClick: () => void;
-  onDocumentsClick: () => void;
   isScoreLoading?: boolean;
 }
 
@@ -41,7 +39,6 @@ export function Sidebar({
   onWorkspaceChange,
   alertCount,
   onAlertsClick,
-  onDocumentsClick,
   isScoreLoading = false,
 }: SidebarProps) {
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -126,19 +123,6 @@ export function Sidebar({
 
           <button
             type="button"
-            onClick={onDocumentsClick}
-            className={`interactive-control w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
-              activeView === "documents"
-                ? "bg-primary-500/20 text-primary-300"
-                : "text-ink-300 hover:bg-ink-800/90 hover:text-white"
-            }`}
-          >
-            <FileText className="h-5 w-5 shrink-0" />
-            {!collapsed && <span className="text-sm font-medium">Documents</span>}
-          </button>
-
-          <button
-            type="button"
             onClick={onAlertsClick}
             className={`interactive-control w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-all ${
               activeView === "alerts"
@@ -180,48 +164,7 @@ export function Sidebar({
 
       <div className="flex-1" />
 
-      {/* Overall Score */}
-      <div className="border-t border-ink-700/50 p-4">
-        {!collapsed ? (
-          <div className="rounded-xl bg-primary-500 p-3">
-            <p className="text-[10px] text-primary-800 uppercase tracking-wider mb-1">Overall RDTII Score</p>
-            {isScoreLoading ? (
-              <div className="space-y-2">
-                <div className="h-8 w-24 animate-pulse rounded bg-white/80" />
-                  <div className="h-1.5 overflow-hidden rounded-full bg-[#806C3B]">
-                  <motion.div
-                    initial={{ x: "-100%" }}
-                    animate={{ x: "100%" }}
-                    transition={{ repeat: Infinity, duration: 1.1, ease: "easeInOut" }}
-                      className="h-full w-1/2 rounded-full bg-ink-900/80"
-                  />
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex items-end gap-2">
-                  <span className="text-3xl font-semibold leading-none text-black">{countryData.overallScore.toFixed(2)}</span>
-                  <span className="text-xs font-medium text-primary-800 mb-1">/ 1.00</span>
-                </div>
-                <div className="mt-3 h-1.5 bg-[#806C3B] rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${countryData.overallScore * 100}%` }}
-                    transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
-                    className="h-full bg-ink-900 rounded-full"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-primary-700/20 bg-primary-500 text-xs font-extrabold text-black">
-              {isScoreLoading ? <span className="h-3 w-7 animate-pulse rounded bg-white/80" /> : countryData.overallScore.toFixed(2)}
-            </div>
-          </div>
-        )}
-      </div>
+      
 
       {/* Collapse Toggle */}
       <button

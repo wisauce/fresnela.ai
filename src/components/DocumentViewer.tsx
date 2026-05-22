@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Link2, X, GitBranch, Calendar, ChevronRight } from "lucide-react";
+import { FileText, Link2, X, GitBranch, Calendar, ChevronRight, Maximize2 } from "lucide-react";
 import type { ConsolidatedMeasure, ConsolidatedParagraph, MeasureVersion } from "@/data/dummy";
 
 interface DocumentViewerProps {
   measure: ConsolidatedMeasure;
   activeParagraphId: string | null;
   onParagraphClear: () => void;
+  onExpandToMeasure?: () => void;
 }
 
 function VersionTimeline({ versions, selectedDate, onDateChange }: { versions: MeasureVersion[]; selectedDate: string; onDateChange: (date: string) => void }) {
@@ -30,13 +31,34 @@ function VersionTimeline({ versions, selectedDate, onDateChange }: { versions: M
   );
 }
 
-function ParagraphBlock({ paragraph, isActive }: { paragraph: ConsolidatedParagraph; isActive: boolean }) {
+function ParagraphBlock({ paragraph, isActive, sourceDocuments }: { paragraph: ConsolidatedParagraph; isActive: boolean; sourceDocuments: { id: string; title: string }[] }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
   useEffect(() => { if (isActive && ref.current) ref.current.scrollIntoView({ behavior: "smooth", block: "center" }); }, [isActive]);
 
+  const handleDragStart = (e: React.DragEvent) => {
+    setIsDragging(true);
+    const sourceDoc = sourceDocuments.find((d) => d.id === paragraph.sourceDocumentId);
+    e.dataTransfer.setData("text/plain", JSON.stringify({
+      type: "evidence",
+      paragraphId: paragraph.id,
+      sourceDocumentId: paragraph.sourceDocumentId,
+      documentTitle: sourceDoc?.title || "Source Document",
+      article: paragraph.sourceArticle,
+      excerpt: paragraph.text.slice(0, 120),
+      confidence: 0.9,
+    }));
+    e.dataTransfer.effectAllowed = "copy";
+  };
+
   return (
-    <motion.div ref={ref} animate={isActive ? { backgroundColor: "rgba(251, 191, 36, 0.15)" } : { backgroundColor: "rgba(0,0,0,0)" }} transition={{ duration: 0.4 }}
-      className={`relative pl-4 py-2 rounded-r-lg transition-all ${isActive ? "border-l-[3px] border-primary-500" : paragraph.linkedIndicators.length > 0 ? "border-l-2 border-primary-200/60 hover:bg-primary-50/20" : "border-l-2 border-transparent"}`}>
+    <div
+      ref={ref}
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={() => setIsDragging(false)}
+      className={`relative pl-4 py-2 rounded-r-lg transition-all cursor-grab active:cursor-grabbing ${isDragging ? "opacity-50 ring-2 ring-primary-400 bg-primary-50" : ""} ${isActive ? "border-l-[3px] border-primary-500 bg-[rgba(251,191,36,0.15)]" : paragraph.linkedIndicators.length > 0 ? "border-l-2 border-primary-200/60 hover:bg-primary-50/30" : "border-l-2 border-transparent hover:bg-primary-50/20"}`}
+    >
       <p className={`text-[13px] leading-relaxed ${isActive ? "text-ink-900 font-medium" : "text-ink-700"}`}>{paragraph.text}</p>
       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
         <span className="text-[10px] font-mono text-ink-400">{paragraph.sourceArticle}</span>
@@ -45,11 +67,11 @@ function ParagraphBlock({ paragraph, isActive }: { paragraph: ConsolidatedParagr
         ))}
         {paragraph.isAmended && <span className="text-[9px] px-1.5 py-0.5 bg-primary-50 text-primary-700 rounded">amended</span>}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
-export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }: DocumentViewerProps) {
+export function DocumentViewer({ measure, activeParagraphId, onParagraphClear, onExpandToMeasure }: DocumentViewerProps) {
   const [selectedDate, setSelectedDate] = useState(measure.lastUpdated);
   const isParagraphVisible = (p: ConsolidatedParagraph) => {
     if (p.effectiveFrom > selectedDate) return false;
@@ -60,7 +82,22 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-comfort">
       <div className="px-5 py-3 border-b border-surface-200 bg-comfort-hover/70 shrink-0">
-        <div className="flex items-center gap-2 mb-1"><FileText className="w-4 h-4 text-primary-600" /><h3 className="text-sm font-semibold text-ink-800">{measure.title}</h3></div>
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-primary-600" />
+            <h3 className="text-sm font-semibold text-ink-800">{measure.title}</h3>
+          </div>
+          {onExpandToMeasure && (
+            <button
+              type="button"
+              onClick={onExpandToMeasure}
+              className="interactive-control inline-flex items-center gap-1.5 rounded-lg border border-primary-200 bg-primary-50 px-2.5 py-1.5 text-[11px] font-semibold text-primary-700 hover:bg-primary-100 transition-colors"
+            >
+              <Maximize2 className="h-3 w-3" />
+              Edit Measure
+            </button>
+          )}
+        </div>
         <p className="text-[11px] text-ink-500 ml-6">{measure.subtitle}</p>
         <div className="mt-2 ml-6 flex items-center gap-2">
           <GitBranch className="w-3.5 h-3.5 text-ink-400 shrink-0" />
@@ -85,8 +122,8 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
           {!activeParagraphId && (
             <div className="rounded-xl border border-dashed border-surface-300 bg-surface-50 px-5 py-6 text-center">
               <FileText className="mx-auto h-6 w-6 text-ink-300" />
-              <p className="mt-2 text-sm font-medium text-ink-700">Select a paragraph to view its source and scoring rationale.</p>
-              <p className="mt-1 text-xs text-ink-500">Click linked evidence from a subpillar card to highlight its source clause here.</p>
+              <p className="mt-2 text-sm font-medium text-ink-700">Consolidated measure clauses are shown below.</p>
+              <p className="mt-1 text-xs text-ink-500">Click evidence from a subpillar to highlight here, or <strong>drag any clause</strong> to a subpillar on the left to link it as evidence.</p>
             </div>
           )}
 
@@ -97,7 +134,7 @@ export function DocumentViewer({ measure, activeParagraphId, onParagraphClear }:
               <div key={section.id}>
                 <h4 className="text-xs font-semibold text-ink-500 uppercase tracking-wider mb-1">{section.heading}</h4>
                 {section.description && <p className="text-[11px] text-ink-400 mb-3">{section.description}</p>}
-                <div className="space-y-1">{visible.map((p) => <ParagraphBlock key={p.id} paragraph={p} isActive={p.id === activeParagraphId} />)}</div>
+                <div className="space-y-1">{visible.map((p) => <ParagraphBlock key={p.id} paragraph={p} isActive={p.id === activeParagraphId} sourceDocuments={measure.sourceDocuments.map((d) => ({ id: d.id, title: d.title }))} />)}</div>
               </div>
             );
           })}
